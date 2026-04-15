@@ -1,7 +1,6 @@
 spring:
 
-  my:
-    jwtsecretkey: ${my.jwtsecretkey}
+  JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
 
   data:
@@ -11,5 +10,5 @@ spring:
       auto-index-creation: true
 
   application:
-    name: remoteJobBoardApp
+    name: techhire-core-api
     
