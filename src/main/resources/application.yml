@@ -1,0 +1,15 @@
+spring:
+
+  my:
+    jwtsecretkey: ${my.jwtsecretkey}
+
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+      database: ${DATABASE_NAME}
+      auto-index-creation: true
+
+  application:
+    name: remoteJobBoardApp
+    
