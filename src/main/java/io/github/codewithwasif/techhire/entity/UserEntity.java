@@ -2,6 +2,7 @@ package io.github.codewithwasif.techhire.entity;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.ArrayList;
@@ -19,4 +20,7 @@ public class UserEntity {
     private String email;
     private String password;
     private List<String> roles = new ArrayList<>();
+
+    @DBRef
+    private List<JobPostEntity> posts = new ArrayList<>();
 }
