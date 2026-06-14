@@ -15,9 +15,7 @@ public class JobApplyEntity {
     @Id
     private ObjectId objectId;
 
-    private String fullName;
-    private String email;
-    private String resumeLink;
+
     private String coverLetter;
     private String githubProfileUrl;
     private String applicationStatus;
