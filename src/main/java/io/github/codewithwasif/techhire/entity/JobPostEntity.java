@@ -1,5 +1,6 @@
 package io.github.codewithwasif.techhire.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +16,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "job_posts")
+@Entity
+@Table(name = "job_posts")
 public class JobPostEntity {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String title;
     private String companyName;
     private String description;
@@ -27,6 +31,10 @@ public class JobPostEntity {
     private List<String> techStack;
     private String status;
 
-    @DBRef
-    private List<JobApplyEntity> applicants = new ArrayList<>();
+    @OneToMany(mappedBy = "jobDetails")
+    private List<JobApplyEntity> applications = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private UserEntity employerDetails;
 }

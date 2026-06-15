@@ -21,6 +21,6 @@ public class UserEntity {
     private String password;
     private List<String> roles = new ArrayList<>();
 
-    @DBRef
-    private List<JobPostEntity> posts = new ArrayList<>();
+ //   @DBRef
+   // private List<JobPostEntity> posts = new ArrayList<>();
 }

@@ -14,9 +14,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,8 +28,16 @@ public class JobPostSvc {
     private final JobPostRepo jobPostRepo;
     private final UserRepo userRepo;
 
+    @Transactional
     public ResponseEntity<HttpStatus> createJob(JobPostDto jobPostDto){
         try {
+            SecurityContext context = SecurityContextHolder.getContext();
+            String name = context.getAuthentication().getName();
+            if (name == null) {
+                return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            }
+            UserEntity employer = userRepo.findByUserName(name);
+
             JobPostEntity job = JobPostEntity.builder().title(jobPostDto.getTitle())
                     .companyName(jobPostDto.getCompanyName())
                     .description(jobPostDto.getDescription())
@@ -35,15 +45,9 @@ public class JobPostSvc {
                     .maxSalary(jobPostDto.getMaxSalary())
                     .techStack(jobPostDto.getTechStack())
                     .status(jobPostDto.getStatus())
+                    .employerDetails(employer)
                     .build();
             jobPostRepo.save(job);
-            SecurityContext context = SecurityContextHolder.getContext();
-            String name = context.getAuthentication().getName();
-            if (name != null){
-                UserEntity user = userRepo.findByUserName(name);
-                user.getPosts().add(job);
-                userRepo.save(user);
-            }
             return new ResponseEntity<>(HttpStatus.CREATED);
         } catch (Exception e) {
             log.error("Error while creating post", e);
@@ -51,14 +55,14 @@ public class JobPostSvc {
         }
     }
 
-    public ResponseEntity<HttpStatus> changePostEntry(JobPostDto newEntry, String id){
+    public ResponseEntity<HttpStatus> changePostEntry(JobPostDto newEntry, Long id){
         JobPostEntity oldEntry = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id: {}", id);
             return new NullPointerException();});
         SecurityContext context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-        UserEntity user = userRepo.findByUserName(name);
+        UserEntity employer = userRepo.findByUserName(name);
         try {
-            if (user.getPosts().stream().anyMatch(x -> x.getId().equals(id))) {
+            if (oldEntry.getEmployerDetails() != null && oldEntry.getEmployerDetails().getId().equals(employer.getId())) {
                 if (StringUtils.hasText(newEntry.getTitle())) oldEntry.setTitle(newEntry.getTitle());
                 if (StringUtils.hasText(newEntry.getCompanyName())) oldEntry.setCompanyName(newEntry.getCompanyName());
                 if (StringUtils.hasText(newEntry.getDescription())) oldEntry.setDescription(newEntry.getDescription());
@@ -72,49 +76,55 @@ public class JobPostSvc {
                 jobPostRepo.save(oldEntry);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
+            else {
+                log.warn("Employer {} attempted to edit Job {} without ownership.", name, id);
+                return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+            }
         } catch (Exception e) {
-            log.error("No post found for User: {} with this ID: {}.", name, id, e);
+            log.error("Error updating post with ID: {}.", id, e);
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    public ResponseEntity<HttpStatus> deleteJobPost(String id){
+    public ResponseEntity<HttpStatus> deleteJobPost(Long id){
         SecurityContext context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         try {
             if (name != null) {
-                UserEntity user = userRepo.findByUserName(name);
-                boolean removed = user.getPosts().removeIf(x -> x.getId().equals(id));
-                if (removed) {
-                    userRepo.save(user);
+                UserEntity employer = userRepo.findByUserName(name);
+                JobPostEntity jobToDelete = jobPostRepo.findById(id).orElse(null);
+                if (jobToDelete == null) {
+                    return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+                }
+                if (jobToDelete.getEmployerDetails() != null &&
+                        jobToDelete.getEmployerDetails().getId().equals(employer.getId())) {
                     jobPostRepo.deleteById(id);
                     return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.FORBIDDEN);
                 }
             }
-        } catch (Exception e) {
+        }
+         catch (Exception e) {
             log.error("No post found for User: {} with this ID: {}.", name, id, e);
+             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    public ResponseEntity<List<JobApplyDto>> getApplicantsById(String id){
-        JobPostEntity entry = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id {}", id);
+    public ResponseEntity<List<JobApplyDto>> getApplicantsById(Long id){
+        JobPostEntity jobOfApplicants = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id {}", id);
             return new NullPointerException();});
         SecurityContext context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
-        UserEntity user = userRepo.findByUserName(name);
+        UserEntity employer = userRepo.findByUserName(name);
         try {
-            if (user.getPosts().stream().anyMatch(x -> x.getId().equals(id))) {
-                List<JobApplyEntity> applicants = entry.getApplicants();
-
+            if (jobOfApplicants.getEmployerDetails() != null && jobOfApplicants.getEmployerDetails().getId().equals(employer.getId())) {
+                List<JobApplyEntity> applicants = jobOfApplicants.getApplications();
                 List<JobApplyDto> build = new ArrayList<>();
                 for (JobApplyEntity applyDto : applicants) {
                     build.add(JobApplyDto.builder()
-                            .fullName(applyDto.getFullName())
-                            .email(applyDto.getEmail())
-                            .resumeLink(applyDto.getResumeLink())
-                            .coverLetter(applyDto.getCoverLetter())
-                            .githubProfileUrl(applyDto.getGithubProfileUrl())
+                            .coverLetterMessage(applyDto.getCoverLetterMessage())
                             .build());
                 }
                 return new ResponseEntity<>(build, HttpStatus.OK);

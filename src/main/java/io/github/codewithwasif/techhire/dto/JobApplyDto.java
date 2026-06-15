@@ -9,13 +9,5 @@ import lombok.*;
 @Builder
 public class JobApplyDto {
     @NotBlank
-    private String fullName;
-    @NotBlank
-    private String email;
-    @NotBlank
-    private String resumeLink;
-    @NotBlank
-    private String coverLetter;
-    @NotBlank
-    private String githubProfileUrl;
+    private String coverLetterMessage;
 }
