@@ -3,11 +3,27 @@ spring:
   JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
 
-  data:
-    mongodb:
-      uri: ${MONGODB_URI}
-      database: ${DATABASE_NAME}
-      auto-index-creation: true
+  datasource:
+    url: jdbc:postgresql://postgresql-journal990-app999.e.aivencloud.com:10838/defaultdb?sslmode=require
+    username: avnadmin
+    password: AVNS_MSj6aJVOhk8axXi699w
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+      database-platform: org.hibernate.dialect.PostgreSQLDialect
+      show-sql: true
+      hibernate:
+        ddl-auto: update
+      properties:
+        hibernate:
+          format_sql: true
+
+
+#  data:
+#    mongodb:
+#      uri: ${MONGODB_URI}
+#      database: ${DATABASE_NAME}
+#      auto-index-creation: true
 
   application:
     name: techhire-core-api

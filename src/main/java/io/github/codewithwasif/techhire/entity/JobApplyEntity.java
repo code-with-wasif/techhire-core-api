@@ -3,7 +3,6 @@ package io.github.codewithwasif.techhire.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -17,6 +16,7 @@ public class JobApplyEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String coverLetterMessage;
     private String applicationStatus;
 
