@@ -21,6 +21,7 @@ public class ResumeEntity {
     private String professionalTitle;
     private String skills;
     private String portfolioUrl;
+    @Column(columnDefinition = "TEXT")
     private String bio;
 
     @OneToOne

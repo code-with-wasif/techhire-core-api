@@ -24,6 +24,7 @@ public class JobPostEntity {
 
     private String title;
     private String companyName;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private int minSalary;
     private int maxSalary;

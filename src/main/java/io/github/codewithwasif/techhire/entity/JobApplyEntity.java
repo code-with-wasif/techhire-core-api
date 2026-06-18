@@ -17,6 +17,7 @@ public class JobApplyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(columnDefinition = "TEXT")
     private String coverLetterMessage;
     private String applicationStatus;
 
