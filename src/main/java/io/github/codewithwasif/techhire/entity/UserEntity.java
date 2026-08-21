@@ -22,8 +22,17 @@ public class UserEntity {
     private String userName;
     private String email;
     private String password;
+
+    @ElementCollection
     private List<String> roles = new ArrayList<>();
 
- //   @DBRef
-   // private List<JobPostEntity> posts = new ArrayList<>();
+    @OneToOne(mappedBy = "candidateDetails", cascade = CascadeType.REMOVE)
+    private ResumeEntity resume;
+
+    @OneToMany(mappedBy = "employerDetails", cascade = CascadeType.REMOVE)
+    private List<JobPostEntity> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "applicantDetails", cascade = CascadeType.REMOVE)
+    private List<JobApplyEntity> applications = new ArrayList<>();
+
 }

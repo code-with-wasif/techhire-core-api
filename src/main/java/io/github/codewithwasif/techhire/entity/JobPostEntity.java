@@ -28,10 +28,13 @@ public class JobPostEntity {
     private String description;
     private int minSalary;
     private int maxSalary;
+
+    @ElementCollection
     private List<String> techStack;
+
     private String status;
 
-    @OneToMany(mappedBy = "jobDetails")
+    @OneToMany(mappedBy = "jobDetails", cascade = CascadeType.REMOVE)
     private List<JobApplyEntity> applications = new ArrayList<>();
 
     @ManyToOne
