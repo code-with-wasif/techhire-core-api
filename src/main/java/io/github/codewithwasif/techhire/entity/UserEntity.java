@@ -23,7 +23,7 @@ public class UserEntity {
     private String email;
     private String password;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
     @OneToOne(mappedBy = "candidateDetails", cascade = CascadeType.REMOVE)
