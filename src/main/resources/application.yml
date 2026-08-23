@@ -1,12 +1,13 @@
 spring:
+  application:
+    name: techhire-core-api
 
   JWT_SECRET_KEY: ${JWT_SECRET_KEY}
 
-
   datasource:
-    url: jdbc:postgresql://postgresql-journal990-app999.e.aivencloud.com:10838/defaultdb?sslmode=require
-    username: avnadmin
-    password: AVNS_MSj6aJVOhk8axXi699w
+    url: ${POSTGRESQL_URL}
+    username: ${POSTGRESQL_USERNAME}
+    password: ${POSTGRESQL_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -25,6 +26,5 @@ spring:
 #      database: ${DATABASE_NAME}
 #      auto-index-creation: true
 
-  application:
-    name: techhire-core-api
+
     
