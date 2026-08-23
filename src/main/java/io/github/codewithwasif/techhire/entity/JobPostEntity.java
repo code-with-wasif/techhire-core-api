@@ -1,10 +1,10 @@
 package io.github.codewithwasif.techhire.entity;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -15,18 +15,29 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "job_posts")
+@Entity
+@Table(name = "job_posts")
 public class JobPostEntity {
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String title;
     private String companyName;
+    @Column(columnDefinition = "TEXT")
     private String description;
     private int minSalary;
     private int maxSalary;
+
+    @ElementCollection
     private List<String> techStack;
+
     private String status;
 
-    @DBRef
-    private List<JobApplyEntity> applicants = new ArrayList<>();
+    @OneToMany(mappedBy = "jobDetails", cascade = CascadeType.REMOVE)
+    private List<JobApplyEntity> applications = new ArrayList<>();
+
+    @ManyToOne
+    @JoinColumn(name = "employer_id")
+    private UserEntity employerDetails;
 }

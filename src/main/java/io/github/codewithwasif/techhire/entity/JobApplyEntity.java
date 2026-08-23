@@ -1,8 +1,8 @@
 package io.github.codewithwasif.techhire.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -10,18 +10,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Document(collection = "applications")
+@Entity
+@Table(name = "applicants")
 public class JobApplyEntity {
     @Id
-    private ObjectId objectId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String fullName;
-    private String email;
-    private String resumeLink;
-    private String coverLetter;
-    private String githubProfileUrl;
+    @Column(columnDefinition = "TEXT")
+    private String coverLetterMessage;
     private String applicationStatus;
 
-    @DBRef
-    private UserEntity userDetails;
+    @ManyToOne
+    @JoinColumn(name = "applicant_id", nullable = false)
+    private UserEntity applicantDetails;
+
+    @ManyToOne
+    @JoinColumn(name = "job_post_id", nullable = false)
+    private JobPostEntity jobDetails;
 }

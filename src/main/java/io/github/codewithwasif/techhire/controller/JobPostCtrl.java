@@ -35,7 +35,7 @@ public class JobPostCtrl {
             summary = "Update an existing job post",
             description = "Enables an employer to update the details of a job post by specifying its ID.")
     @PutMapping("/update-entry/{id}")
-    public ResponseEntity<HttpStatus> changePostEntry(@RequestBody JobPostDto jobPostDto, @PathVariable String id){
+    public ResponseEntity<HttpStatus> changePostEntry(@RequestBody JobPostDto jobPostDto, @PathVariable Long id){
        return jobPostSvc.changePostEntry(jobPostDto, id);
     }
 
@@ -43,7 +43,7 @@ public class JobPostCtrl {
             summary = "Delete a job post",
             description = "Allows an employer to delete a job post by providing its ID.")
     @DeleteMapping("/delete-post/{id}")
-    public ResponseEntity<HttpStatus> deleteJobPost(@PathVariable String id){
+    public ResponseEntity<HttpStatus> deleteJobPost(@PathVariable Long id){
         return jobPostSvc.deleteJobPost(id);
     }
 
@@ -51,7 +51,7 @@ public class JobPostCtrl {
             summary = "Get all applicants for a job",
             description = "Lists all applicants who applied for a specific job post by its ID.")
     @GetMapping("/get-all-applicants/{id}")
-    public ResponseEntity<List<JobApplyDto>> getApplicantsById(@PathVariable String id){
+    public ResponseEntity<List<JobApplyDto>> getApplicantsById(@PathVariable Long id){
        return jobPostSvc.getApplicantsById(id);
     }
 }

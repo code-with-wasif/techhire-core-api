@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 public class JobPostDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private String id;
+    private Long id;
 
     @NotBlank(message = "Title cannot be empty")
     private String title;

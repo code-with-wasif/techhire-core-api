@@ -1,10 +1,2 @@
----
-title: TechHire API
-emoji: 🚀
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-pinned: false
-license: mit
-app_port: 7860
----
+# TechHire API 🚀
+The secure, core backend engine for a modern tech job marketplace.
