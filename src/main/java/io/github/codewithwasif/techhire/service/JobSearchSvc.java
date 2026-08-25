@@ -2,7 +2,7 @@ package io.github.codewithwasif.techhire.service;
 
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
-import io.github.codewithwasif.techhire.repository.JobApplyRepoImpl;
+import io.github.codewithwasif.techhire.repository.JobPostRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +15,10 @@ import java.util.List;
 @Service
 public class JobSearchSvc {
 
-    private final JobApplyRepoImpl jobApplyRepoimpl;
+    private final JobPostRepo jobPostRepo;
 
     public ResponseEntity<List<JobPostDto>> customSearch(String techStack, Integer minSalary){
-        List<JobPostEntity> employerEntities = jobApplyRepoimpl.customJobsSearch(techStack, minSalary);
+        List<JobPostEntity> employerEntities = jobPostRepo.customJobsSearch(techStack, minSalary);
         List<JobPostDto> result = new ArrayList<>();
         if (!employerEntities.isEmpty()) {
             for (JobPostEntity all:employerEntities) {
