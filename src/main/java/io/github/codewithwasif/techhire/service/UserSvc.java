@@ -11,10 +11,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,9 +62,15 @@ public class UserSvc {
 
     public ResponseEntity<String> login(UserDto userDto){
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     userDto.getUserName(), userDto.getPassword()));
-            String token = jwtUtils.generateToken(userDto.getUserName());
+
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            List<String> roles = userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .toList();
+
+            String token = jwtUtils.generateToken(userDto.getUserName(), roles);
             return new ResponseEntity<>(token, HttpStatus.OK);
         } catch (BadCredentialsException e){
             log.warn("Failed login attempt for user: {}", userDto.getUserName(), e);
