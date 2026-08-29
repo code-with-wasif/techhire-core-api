@@ -32,6 +32,14 @@ public class JobPostCtrl {
     }
 
     @Operation(
+            summary = "Get all job posts",
+            description = "Allows an employer to see all his job posts")
+    @GetMapping("/my-jobs")
+    public ResponseEntity<List<JobPostDto>> getMyJobs(){
+        return jobPostSvc.getMyJobs();
+    }
+
+    @Operation(
             summary = "Update an existing job post",
             description = "Enables an employer to update the details of a job post by specifying its ID.")
     @PutMapping("/update-entry/{id}")

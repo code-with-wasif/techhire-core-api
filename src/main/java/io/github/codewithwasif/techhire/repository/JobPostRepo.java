@@ -16,4 +16,7 @@ public interface JobPostRepo extends JpaRepository<JobPostEntity, Long> {
             "(:minSalary IS NULL OR j.minSalary >= :minSalary)")
     List<JobPostEntity> customJobsSearch(@Param("techStack") String techStack,
                                                 @Param("minSalary") Integer minSalary);
+
+    @Query(value = "SELECT * FROM job_posts WHERE employer_id = :id", nativeQuery = true)
+    List<JobPostEntity> getAllJobsById(@Param("id") Long id);
 }

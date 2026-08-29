@@ -55,6 +55,31 @@ public class JobPostSvc {
         }
     }
 
+    public ResponseEntity<List<JobPostDto>> getMyJobs(){
+            SecurityContext context = SecurityContextHolder.getContext();
+        String name = context.getAuthentication().getName();
+        UserEntity user = userRepo.findByUserName(name);
+        if (user == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        Long userId = user.getId();
+        List<JobPostEntity> allJobsById = jobPostRepo.getAllJobsById(userId);
+        List<JobPostDto> jobPostDto = new ArrayList<>();
+        for(JobPostEntity jobPostEntity:allJobsById ) {
+            jobPostDto.add(JobPostDto.builder()
+                    .id(jobPostEntity.getId())
+                    .title(jobPostEntity.getTitle())
+                    .companyName(jobPostEntity.getCompanyName())
+                    .description(jobPostEntity.getDescription())
+                    .minSalary(jobPostEntity.getMinSalary())
+                    .maxSalary(jobPostEntity.getMaxSalary())
+                    .techStack(jobPostEntity.getTechStack())
+                    .status(jobPostEntity.getStatus())
+                    .build()) ;
+        }
+        return new ResponseEntity<>(jobPostDto, HttpStatus.OK);
+    }
+
     public ResponseEntity<HttpStatus> changePostEntry(JobPostDto newEntry, Long id){
         JobPostEntity oldEntry = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id: {}", id);
             return new NullPointerException();});
