@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.mongodb.core.index.Indexed;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +11,6 @@ import org.springframework.data.mongodb.core.index.Indexed;
 public class UserDto {
 
     @NotBlank(message = "Username cannot be empty")
-    @Indexed(unique = true)
     private String userName;
     @NotBlank(message = "Email is required")
     private String email;

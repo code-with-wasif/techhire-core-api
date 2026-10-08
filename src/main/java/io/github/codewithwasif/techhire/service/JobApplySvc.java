@@ -1,11 +1,11 @@
 package io.github.codewithwasif.techhire.service;
 
 import io.github.codewithwasif.techhire.dto.JobApplyDto;
-import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.entity.JobApplyEntity;
+import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.entity.UserEntity;
-import io.github.codewithwasif.techhire.repository.JobPostRepo;
 import io.github.codewithwasif.techhire.repository.JobApplyRepo;
+import io.github.codewithwasif.techhire.repository.JobPostRepo;
 import io.github.codewithwasif.techhire.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

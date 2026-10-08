@@ -3,8 +3,8 @@ package io.github.codewithwasif.techhire.service;
 import io.github.codewithwasif.techhire.dto.JobApplyDto;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.dto.ResumeDto;
-import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.entity.JobApplyEntity;
+import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.entity.ResumeEntity;
 import io.github.codewithwasif.techhire.entity.UserEntity;
 import io.github.codewithwasif.techhire.repository.JobPostRepo;
@@ -19,6 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
 import java.util.ArrayList;
 import java.util.List;
 
