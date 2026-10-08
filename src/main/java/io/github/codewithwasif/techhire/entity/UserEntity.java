@@ -26,8 +26,8 @@ public class UserEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> roles = new ArrayList<>();
 
-    @OneToOne(mappedBy = "candidateDetails", cascade = CascadeType.REMOVE)
-    private ResumeEntity resume;
+    @OneToMany(mappedBy = "candidateDetails", cascade = CascadeType.REMOVE)
+    private List<ResumeEntity> resumes = new ArrayList<>();
 
     @OneToMany(mappedBy = "employerDetails", cascade = CascadeType.REMOVE)
     private List<JobPostEntity> posts = new ArrayList<>();

@@ -20,6 +20,7 @@ public class JobApplyEntity {
     @Column(columnDefinition = "TEXT")
     private String coverLetterMessage;
     private String applicationStatus;
+    private Long resumeId;
 
     @ManyToOne
     @JoinColumn(name = "applicant_id", nullable = false)

@@ -40,6 +40,7 @@ public class JobApplySvc {
             JobApplyEntity application = JobApplyEntity.builder()
                     .coverLetterMessage(jobApplyDto.getCoverLetterMessage())
                     .applicationStatus("PENDING")
+                    .resumeId(jobApplyDto.getResumeId())
                     .jobDetails(jobToApply)
                     .applicantDetails(applicant)
                     .build();

@@ -24,7 +24,7 @@ public class ResumeEntity {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "candidate_id", nullable = false)
     private UserEntity candidateDetails;
 }

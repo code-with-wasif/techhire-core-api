@@ -2,10 +2,13 @@ package io.github.codewithwasif.techhire.service;
 
 import io.github.codewithwasif.techhire.dto.JobApplyDto;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
+import io.github.codewithwasif.techhire.dto.ResumeDto;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.entity.JobApplyEntity;
+import io.github.codewithwasif.techhire.entity.ResumeEntity;
 import io.github.codewithwasif.techhire.entity.UserEntity;
 import io.github.codewithwasif.techhire.repository.JobPostRepo;
+import io.github.codewithwasif.techhire.repository.ResumeRepo;
 import io.github.codewithwasif.techhire.repository.UserRepo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ public class JobPostSvc {
 
     private final JobPostRepo jobPostRepo;
     private final UserRepo userRepo;
+    private final ResumeRepo resumeRepo;
 
     @Transactional
     public ResponseEntity<HttpStatus> createJob(JobPostDto jobPostDto){
@@ -148,8 +151,19 @@ public class JobPostSvc {
                 List<JobApplyEntity> applicants = jobOfApplicants.getApplications();
                 List<JobApplyDto> build = new ArrayList<>();
                 for (JobApplyEntity applyDto : applicants) {
+                    Long resumeId = applyDto.getResumeId();
+                    ResumeEntity resumeEntity = resumeRepo.findById(resumeId).orElseThrow(()->{ log.error("Resume not found with Id {}", resumeId);
+                        return new NullPointerException();});
+                    ResumeDto resumeDto = ResumeDto.builder()
+                            .fullName(resumeEntity.getFullName())
+                            .professionalTitle(resumeEntity.getProfessionalTitle())
+                            .skills(resumeEntity.getSkills())
+                            .portfolioUrl(resumeEntity.getPortfolioUrl())
+                            .bio(resumeEntity.getBio())
+                            .build();
                     build.add(JobApplyDto.builder()
                             .coverLetterMessage(applyDto.getCoverLetterMessage())
+                            .resumeDto(resumeDto)
                             .build());
                 }
                 return new ResponseEntity<>(build, HttpStatus.OK);

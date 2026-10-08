@@ -13,6 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -39,6 +42,26 @@ public class ResumeSvc {
             log.error("Error While Creating Resume", e);
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public List<ResumeDto> getResumes(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserEntity candidate = userRepo.findByUserName(username);
+        long id = candidate.getId();
+        List<ResumeEntity> resumeList = resumeRepo.getAllResumesById(id);
+        List<ResumeDto> resumeDtos = new ArrayList<>();
+        for (ResumeEntity resume: resumeList){
+            ResumeDto resumeDto = ResumeDto.builder()
+                    .id(resume.getId())
+                    .fullName(resume.getFullName())
+                    .professionalTitle(resume.getProfessionalTitle())
+                    .skills(resume.getSkills())
+                    .portfolioUrl(resume.getPortfolioUrl())
+                    .bio(resume.getBio())
+                    .build();
+            resumeDtos.add(resumeDto);
+        }
+        return resumeDtos;
     }
 
 }
