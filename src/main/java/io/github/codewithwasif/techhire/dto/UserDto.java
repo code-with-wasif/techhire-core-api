@@ -1,19 +1,40 @@
 package io.github.codewithwasif.techhire.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import jakarta.validation.constraints.Size;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class UserDto {
+public final class UserDto {
+    private UserDto(){}
 
-    @NotBlank(message = "Username cannot be empty")
-    private String userName;
-    @NotBlank(message = "Email is required")
-    private String email;
-    @NotBlank(message = "Password is required")
-    private String password;
+    public record CreateUserRequest(
+            @NotBlank(message = "Username cannot be empty")
+            @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
+            String userName,
+
+            @NotBlank(message = "Email is required")
+            @Email
+            String email,
+
+            @NotBlank(message = "Password is required")
+            @Size(min = 8, message = "Password must be at least 8 characters long")
+            String password) {}
+
+
+
+    public record LoginRequest(
+            @NotBlank(message = "Username cannot be empty")
+            String userName,
+
+            @NotBlank(message = "Password is required")
+            String password) {}
+
+
+    @Builder
+    public record UserResponse(
+            String userName,
+            String email) {}
 }

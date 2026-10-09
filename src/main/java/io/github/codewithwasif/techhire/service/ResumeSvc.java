@@ -24,16 +24,16 @@ public class ResumeSvc {
     private final ResumeRepo resumeRepo;
 
     @Transactional
-    public ResponseEntity<HttpStatus> uploadResume(ResumeDto resumeDto){
+    public ResponseEntity<HttpStatus> uploadResume(ResumeDto.CreateResumeRequest createRequest){
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity candidate = userRepo.findByUserName(userName);
         try {
             ResumeEntity resume = ResumeEntity.builder()
-                    .fullName(resumeDto.getFullName())
-                    .professionalTitle(resumeDto.getProfessionalTitle())
-                    .skills(resumeDto.getSkills())
-                    .portfolioUrl(resumeDto.getPortfolioUrl())
-                    .bio(resumeDto.getBio())
+                    .fullName(createRequest.fullName())
+                    .professionalTitle(createRequest.professionalTitle())
+                    .skills(createRequest.skills())
+                    .portfolioUrl(createRequest.portfolioUrl())
+                    .bio(createRequest.bio())
                     .candidateDetails(candidate)
                     .build();
             resumeRepo.save(resume);
@@ -44,14 +44,14 @@ public class ResumeSvc {
         }
     }
 
-    public List<ResumeDto> getResumes(){
+    public List<ResumeDto.ResumeResponse> getResumes(){
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         UserEntity candidate = userRepo.findByUserName(username);
         long id = candidate.getId();
         List<ResumeEntity> resumeList = resumeRepo.getAllResumesById(id);
-        List<ResumeDto> resumeDtos = new ArrayList<>();
+        List<ResumeDto.ResumeResponse> responseList = new ArrayList<>();
         for (ResumeEntity resume: resumeList){
-            ResumeDto resumeDto = ResumeDto.builder()
+            ResumeDto.ResumeResponse resumeDto = ResumeDto.ResumeResponse.builder()
                     .id(resume.getId())
                     .fullName(resume.getFullName())
                     .professionalTitle(resume.getProfessionalTitle())
@@ -59,9 +59,9 @@ public class ResumeSvc {
                     .portfolioUrl(resume.getPortfolioUrl())
                     .bio(resume.getBio())
                     .build();
-            resumeDtos.add(resumeDto);
+            responseList.add(resumeDto);
         }
-        return resumeDtos;
+        return responseList;
     }
 
 }

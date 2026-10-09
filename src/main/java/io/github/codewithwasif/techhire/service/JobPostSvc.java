@@ -19,7 +19,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class JobPostSvc {
     private final ResumeRepo resumeRepo;
 
     @Transactional
-    public ResponseEntity<HttpStatus> createJob(JobPostDto jobPostDto){
+    public ResponseEntity<HttpStatus> createJob(JobPostDto.CreateJobPostRequest createRequest){
         try {
             SecurityContext context = SecurityContextHolder.getContext();
             String name = context.getAuthentication().getName();
@@ -42,13 +41,13 @@ public class JobPostSvc {
             }
             UserEntity employer = userRepo.findByUserName(name);
 
-            JobPostEntity job = JobPostEntity.builder().title(jobPostDto.getTitle())
-                    .companyName(jobPostDto.getCompanyName())
-                    .description(jobPostDto.getDescription())
-                    .minSalary(jobPostDto.getMinSalary())
-                    .maxSalary(jobPostDto.getMaxSalary())
-                    .techStack(jobPostDto.getTechStack())
-                    .status(jobPostDto.getStatus())
+            JobPostEntity job = JobPostEntity.builder().title(createRequest.title())
+                    .companyName(createRequest.companyName())
+                    .description(createRequest.description())
+                    .minSalary(createRequest.minSalary())
+                    .maxSalary(createRequest.maxSalary())
+                    .techStack(createRequest.techStack())
+                    .status(createRequest.status())
                     .employerDetails(employer)
                     .build();
             jobPostRepo.save(job);
@@ -59,7 +58,7 @@ public class JobPostSvc {
         }
     }
 
-    public ResponseEntity<List<JobPostDto>> getMyJobs(){
+    public ResponseEntity<List<JobPostDto.JobPostResponse>> getMyJobs(){
             SecurityContext context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         UserEntity user = userRepo.findByUserName(name);
@@ -68,9 +67,9 @@ public class JobPostSvc {
         }
         Long userId = user.getId();
         List<JobPostEntity> allJobsById = jobPostRepo.getAllJobsById(userId);
-        List<JobPostDto> jobPostDto = new ArrayList<>();
+        List<JobPostDto.JobPostResponse> jobPostDto = new ArrayList<>();
         for(JobPostEntity jobPostEntity:allJobsById ) {
-            jobPostDto.add(JobPostDto.builder()
+            jobPostDto.add(JobPostDto.JobPostResponse.builder()
                     .id(jobPostEntity.getId())
                     .title(jobPostEntity.getTitle())
                     .companyName(jobPostEntity.getCompanyName())
@@ -84,7 +83,7 @@ public class JobPostSvc {
         return new ResponseEntity<>(jobPostDto, HttpStatus.OK);
     }
 
-    public ResponseEntity<HttpStatus> changePostEntry(JobPostDto newEntry, Long id){
+    public ResponseEntity<HttpStatus> changePostEntry(JobPostDto.UpdateJobPostRequest newEntry, Long id){
         JobPostEntity oldEntry = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id: {}", id);
             return new NullPointerException();});
         SecurityContext context = SecurityContextHolder.getContext();
@@ -92,16 +91,16 @@ public class JobPostSvc {
         UserEntity employer = userRepo.findByUserName(name);
         try {
             if (oldEntry.getEmployerDetails() != null && oldEntry.getEmployerDetails().getId().equals(employer.getId())) {
-                if (StringUtils.hasText(newEntry.getTitle())) oldEntry.setTitle(newEntry.getTitle());
-                if (StringUtils.hasText(newEntry.getCompanyName())) oldEntry.setCompanyName(newEntry.getCompanyName());
-                if (StringUtils.hasText(newEntry.getDescription())) oldEntry.setDescription(newEntry.getDescription());
-                if (newEntry.getMinSalary() != null && newEntry.getMinSalary() >= 0)
-                    oldEntry.setMinSalary(newEntry.getMinSalary());
-                if (newEntry.getMaxSalary() != null && newEntry.getMaxSalary() >= 0)
-                    oldEntry.setMaxSalary(newEntry.getMaxSalary());
-                if (newEntry.getTechStack() != null && !newEntry.getTechStack().isEmpty())
-                    oldEntry.setTechStack(newEntry.getTechStack());
-                if (StringUtils.hasText(newEntry.getStatus())) oldEntry.setStatus(newEntry.getStatus());
+                if (StringUtils.hasText(newEntry.title())) oldEntry.setTitle(newEntry.title());
+                if (StringUtils.hasText(newEntry.companyName())) oldEntry.setCompanyName(newEntry.companyName());
+                if (StringUtils.hasText(newEntry.description())) oldEntry.setDescription(newEntry.description());
+                if (newEntry.minSalary() != null && newEntry.minSalary() >= 0)
+                    oldEntry.setMinSalary(newEntry.minSalary());
+                if (newEntry.maxSalary() != null && newEntry.maxSalary() >= 0)
+                    oldEntry.setMaxSalary(newEntry.maxSalary());
+                if (newEntry.techStack() != null && !newEntry.techStack().isEmpty())
+                    oldEntry.setTechStack(newEntry.techStack());
+                if (StringUtils.hasText(newEntry.status())) oldEntry.setStatus(newEntry.status());
                 jobPostRepo.save(oldEntry);
                 return new ResponseEntity<>(HttpStatus.OK);
             }
@@ -141,7 +140,7 @@ public class JobPostSvc {
         return new ResponseEntity<>(HttpStatus.FORBIDDEN);
     }
 
-    public ResponseEntity<List<JobApplyDto>> getApplicantsById(Long id){
+    public ResponseEntity<List<JobPostDto.ApplicantReviewResponse>> getApplicantsById(Long id){
         JobPostEntity jobOfApplicants = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id {}", id);
             return new NullPointerException();});
         SecurityContext context = SecurityContextHolder.getContext();
@@ -150,24 +149,29 @@ public class JobPostSvc {
         try {
             if (jobOfApplicants.getEmployerDetails() != null && jobOfApplicants.getEmployerDetails().getId().equals(employer.getId())) {
                 List<JobApplyEntity> applicants = jobOfApplicants.getApplications();
-                List<JobApplyDto> build = new ArrayList<>();
+                List<JobPostDto.ApplicantReviewResponse> applicantReviewResponses = new ArrayList<>();
+
                 for (JobApplyEntity applyDto : applicants) {
                     Long resumeId = applyDto.getResumeId();
                     ResumeEntity resumeEntity = resumeRepo.findById(resumeId).orElseThrow(()->{ log.error("Resume not found with Id {}", resumeId);
                         return new NullPointerException();});
-                    ResumeDto resumeDto = ResumeDto.builder()
+
+                    ResumeDto.EmployerResumeResponse resumeDto = ResumeDto.EmployerResumeResponse.builder()
                             .fullName(resumeEntity.getFullName())
                             .professionalTitle(resumeEntity.getProfessionalTitle())
                             .skills(resumeEntity.getSkills())
                             .portfolioUrl(resumeEntity.getPortfolioUrl())
                             .bio(resumeEntity.getBio())
                             .build();
-                    build.add(JobApplyDto.builder()
+
+                    JobApplyDto.EmployerResponse applicantsDto = JobApplyDto.EmployerResponse.builder()
                             .coverLetterMessage(applyDto.getCoverLetterMessage())
-                            .resumeDto(resumeDto)
-                            .build());
+                            .build();
+
+                    JobPostDto.ApplicantReviewResponse response = new JobPostDto.ApplicantReviewResponse(applicantsDto, resumeDto);
+                    applicantReviewResponses.add(response);
                 }
-                return new ResponseEntity<>(build, HttpStatus.OK);
+                return new ResponseEntity<>(applicantReviewResponses, HttpStatus.OK);
             }
         } catch (Exception e) {
             log.error("No post found for User: {} with this ID: {}.", name, id, e);
