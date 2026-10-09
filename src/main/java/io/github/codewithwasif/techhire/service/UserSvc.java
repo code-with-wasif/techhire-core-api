@@ -29,51 +29,65 @@ public class UserSvc {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<UserDto> createDev(UserDto userDto){
+    public ResponseEntity<UserDto.UserResponseDto> createDev(UserDto.CreateUserRequestDto userRequestDto){
         try {
-            UserEntity user = UserEntity.builder().userName(userDto.getUserName())
-                    .email(userDto.getEmail())
-                    .password(passwordEncoder.encode(userDto.getPassword()))
+            UserEntity user = UserEntity.builder().userName(userRequestDto.userName())
+                    .email(userRequestDto.email())
+                    .password(passwordEncoder.encode(userRequestDto.password()))
                     .roles(List.of("DEVELOPER"))
                     .build();
             userRepo.save(user);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+
+            UserDto.UserResponseDto userResponseDto = UserDto.UserResponseDto.builder()
+                    .userName(user.getUserName())
+                    .email(user.getEmail())
+                    .build();
+
+            return new ResponseEntity<>(userResponseDto, HttpStatus.CREATED);
         } catch (Exception e) {
-            log.error("Error while creating user {}",userDto.getUserName(),e);
+            log.error("Error while creating user {}",userRequestDto.userName(),e);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<UserDto> createEmp(UserDto userDto){
+    public ResponseEntity<UserDto.UserResponseDto> createEmp(UserDto.CreateUserRequestDto userRequestDto){
         try {
-            UserEntity user = UserEntity.builder().userName(userDto.getUserName())
-                    .email(userDto.getEmail())
-                    .password(passwordEncoder.encode(userDto.getPassword()))
+            UserEntity user = UserEntity.builder().userName(userRequestDto.userName())
+                    .email(userRequestDto.email())
+                    .password(passwordEncoder.encode(userRequestDto.password()))
                     .roles(List.of("EMPLOYER"))
                     .build();
             userRepo.save(user);
-            return new ResponseEntity<>(HttpStatus.CREATED);
+
+            UserDto.UserResponseDto userResponseDto = UserDto.UserResponseDto.builder()
+                    .userName(user.getUserName())
+                    .email(user.getEmail())
+                    .build();
+
+            return new ResponseEntity<>(userResponseDto, HttpStatus.CREATED);
+
         } catch (Exception e) {
-           log.error("Error while creating user {}",userDto.getUserName(),e);
+           log.error("Error while creating user {}",userRequestDto.userName(),e);
         }
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<String> login(UserDto userDto){
+    public ResponseEntity<String> login(UserDto.LoginUserRequestDto userRequestDto){
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    userDto.getUserName(), userDto.getPassword()));
+                    userRequestDto.userName(), userRequestDto.password()));
 
             UserDetails userDetails = (UserDetails) authentication.getPrincipal();
             List<String> roles = userDetails.getAuthorities().stream()
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            String token = jwtUtils.generateToken(userDto.getUserName(), roles);
+            String token = jwtUtils.generateToken(userRequestDto.userName(), roles);
             return new ResponseEntity<>(token, HttpStatus.OK);
+
         } catch (BadCredentialsException e){
-            log.warn("Failed login attempt for user: {}", userDto.getUserName(), e);
-            return new ResponseEntity<>( "Invalid Username and password", HttpStatus.UNAUTHORIZED);
+            log.warn("Failed login attempt for user: {}", userRequestDto.userName(), e);
+            return new ResponseEntity<>( HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             log.error("Error during login", e);
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
