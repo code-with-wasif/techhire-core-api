@@ -26,7 +26,7 @@ public class JobApplySvc {
     private final UserRepo userRepo;
 
     @Transactional
-    public ResponseEntity<HttpStatus> applyJob(Long id, JobApplyDto.CreateRequest createRequest){
+    public ResponseEntity<HttpStatus> applyJob(Long id, JobApplyDto.CreateApplicationRequest createApplicationRequest){
         JobPostEntity jobToApply = jobPostRepo.findById(id).orElseThrow(() -> {
             log.error("Job Not Found With Id: {}", id);
             return new ResponseStatusException(HttpStatus.NOT_FOUND, "Job Post Not Found");
@@ -38,9 +38,9 @@ public class JobApplySvc {
         }
         try {
             JobApplyEntity application = JobApplyEntity.builder()
-                    .coverLetterMessage(createRequest.coverLetterMessage())
+                    .coverLetterMessage(createApplicationRequest.coverLetterMessage())
                     .applicationStatus("PENDING")
-                    .resumeId(createRequest.resumeId())
+                    .resumeId(createApplicationRequest.resumeId())
                     .jobDetails(jobToApply)
                     .applicantDetails(applicant)
                     .build();
