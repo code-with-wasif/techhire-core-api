@@ -1,7 +1,6 @@
 package io.github.codewithwasif.techhire.controller;
 
 
-import io.github.codewithwasif.techhire.dto.JobApplyDto;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.service.JobPostSvc;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,15 +26,15 @@ public class JobPostCtrl {
             summary = "Create a new job post",
             description = "Allows an employer to create a new job posting by providing job details.")
     @PostMapping("/post-job")
-    public ResponseEntity<HttpStatus> createJob(@Valid @RequestBody JobPostDto jobPostDto){
-        return jobPostSvc.createJob(jobPostDto);
+    public ResponseEntity<HttpStatus> createJob(@Valid @RequestBody JobPostDto.CreateRequest createRequest){
+        return jobPostSvc.createJob(createRequest);
     }
 
     @Operation(
             summary = "Get all job posts",
             description = "Allows an employer to see all his job posts")
     @GetMapping("/my-jobs")
-    public ResponseEntity<List<JobPostDto>> getMyJobs(){
+    public ResponseEntity<List<JobPostDto.Response>> getMyJobs(){
         return jobPostSvc.getMyJobs();
     }
 
@@ -43,8 +42,8 @@ public class JobPostCtrl {
             summary = "Update an existing job post",
             description = "Enables an employer to update the details of a job post by specifying its ID.")
     @PutMapping("/update-entry/{id}")
-    public ResponseEntity<HttpStatus> changePostEntry(@RequestBody JobPostDto jobPostDto, @PathVariable Long id){
-       return jobPostSvc.changePostEntry(jobPostDto, id);
+    public ResponseEntity<HttpStatus> changePostEntry(@RequestBody JobPostDto.UpdateRequest updateRequest, @PathVariable Long id){
+       return jobPostSvc.changePostEntry(updateRequest, id);
     }
 
     @Operation(
@@ -59,7 +58,7 @@ public class JobPostCtrl {
             summary = "Get all applicants for a job",
             description = "Lists all applicants who applied for a specific job post by its ID.")
     @GetMapping("/get-all-applicants/{id}")
-    public ResponseEntity<List<JobApplyDto>> getApplicantsById(@PathVariable Long id){
+    public ResponseEntity<List<JobPostDto.ApplicantReviewResponse>> getApplicantsById(@PathVariable Long id){
        return jobPostSvc.getApplicantsById(id);
     }
 }

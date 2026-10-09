@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ResumeDto {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+
     private Long id;
 
     @NotBlank
@@ -25,5 +26,14 @@ public class ResumeDto {
     private String portfolioUrl;
     @NotBlank
     private String bio;
+
+    @Builder
+    public record EmployerResponse(
+            @NotBlank String fullName,
+            @NotBlank String professionalTitle,
+            @NotBlank String skills,
+            @NotBlank String portfolioUrl,
+            @NotBlank String bio
+    ) {}
 
 }
