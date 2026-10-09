@@ -1,34 +1,36 @@
 package io.github.codewithwasif.techhire.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.URL;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class ResumeDto {
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
 
-    private Long id;
 
-    @NotBlank
-    private String fullName;
-    @NotBlank
-    private String professionalTitle;
-    @NotBlank
-    private String skills;
-    @NotBlank
-    private String portfolioUrl;
-    @NotBlank
-    private String bio;
+public final class ResumeDto {
+    ResumeDto(){
+    }
+
+    public record CreateResumeRequest(
+            @NotBlank(message = "User's full name is required") String fullName,
+            @NotBlank(message = "Professional title is required") String professionalTitle,
+            @NotBlank(message = "Skills are required") String skills,
+            @NotBlank(message = "Portfolio URL is required")
+            @URL(message = "Portfolio URL must be valid") String portfolioUrl,
+            @NotBlank(message = "Bio is required") String bio
+    ) {}
 
     @Builder
-    public record EmployerResponse(
+    public record ResumeResponse(
+            Long id,
+            String fullName,
+            String professionalTitle,
+            String skills,
+            String portfolioUrl,
+            String bio
+    ) {}
+
+    @Builder
+    public record EmployerResumeResponse(
             @NotBlank String fullName,
             @NotBlank String professionalTitle,
             @NotBlank String skills,

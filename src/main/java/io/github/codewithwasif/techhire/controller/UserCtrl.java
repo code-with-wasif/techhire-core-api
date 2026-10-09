@@ -26,7 +26,7 @@ public class UserCtrl {
             summary = "Developer sign-up",
             description = "Registers a new developer account by providing user details in the request body.")
     @PostMapping("/sign-up/dev")
-    public ResponseEntity<UserDto.UserResponseDto> devSignUp(@Valid @RequestBody UserDto.CreateUserRequestDto userRequestDto){
+    public ResponseEntity<UserDto.UserResponse> devSignUp(@Valid @RequestBody UserDto.CreateUserRequest userRequestDto){
         return userSvc.createDev(userRequestDto);
     }
 
@@ -34,7 +34,7 @@ public class UserCtrl {
             summary = "Employer sign-up",
             description = "Registers a new employer account by providing user details in the request body.")
     @PostMapping("/sign-up/emp")
-    public ResponseEntity<UserDto.UserResponseDto> empSignUp(@Valid @RequestBody UserDto.CreateUserRequestDto userRequestDto){
+    public ResponseEntity<UserDto.UserResponse> empSignUp(@Valid @RequestBody UserDto.CreateUserRequest userRequestDto){
         return userSvc.createEmp(userRequestDto);
     }
 
@@ -42,7 +42,7 @@ public class UserCtrl {
             summary = "User login",
             description = "Authenticates a user by verifying their username and password, returning a token if successful.")
     @PostMapping("/login")
-    public ResponseEntity<String> loginDev(@RequestBody UserDto.LoginUserRequestDto userRequestDto){
+    public ResponseEntity<String> loginDev(@Valid @RequestBody UserDto.LoginRequest userRequestDto){
         return userSvc.login(userRequestDto);
     }
 }

@@ -17,12 +17,12 @@ public class JobSearchSvc {
 
     private final JobPostRepo jobPostRepo;
 
-    public ResponseEntity<List<JobPostDto.Response>> customSearch(String techStack, Integer minSalary){
+    public ResponseEntity<List<JobPostDto.JobPostResponse>> customSearch(String techStack, Integer minSalary){
         List<JobPostEntity> employerEntities = jobPostRepo.customJobsSearch(techStack, minSalary);
-        List<JobPostDto.Response> result = new ArrayList<>();
+        List<JobPostDto.JobPostResponse> result = new ArrayList<>();
         if (!employerEntities.isEmpty()) {
             for (JobPostEntity all:employerEntities) {
-                result.add(JobPostDto.Response.builder()
+                result.add(JobPostDto.JobPostResponse.builder()
                         .id(all.getId())
                         .title(all.getTitle())
                         .companyName(all.getCompanyName())

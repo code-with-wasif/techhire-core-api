@@ -32,7 +32,7 @@ public class JobPostSvc {
     private final ResumeRepo resumeRepo;
 
     @Transactional
-    public ResponseEntity<HttpStatus> createJob(JobPostDto.CreateRequest createRequest){
+    public ResponseEntity<HttpStatus> createJob(JobPostDto.CreateJobPostRequest createRequest){
         try {
             SecurityContext context = SecurityContextHolder.getContext();
             String name = context.getAuthentication().getName();
@@ -58,7 +58,7 @@ public class JobPostSvc {
         }
     }
 
-    public ResponseEntity<List<JobPostDto.Response>> getMyJobs(){
+    public ResponseEntity<List<JobPostDto.JobPostResponse>> getMyJobs(){
             SecurityContext context = SecurityContextHolder.getContext();
         String name = context.getAuthentication().getName();
         UserEntity user = userRepo.findByUserName(name);
@@ -67,9 +67,9 @@ public class JobPostSvc {
         }
         Long userId = user.getId();
         List<JobPostEntity> allJobsById = jobPostRepo.getAllJobsById(userId);
-        List<JobPostDto.Response> jobPostDto = new ArrayList<>();
+        List<JobPostDto.JobPostResponse> jobPostDto = new ArrayList<>();
         for(JobPostEntity jobPostEntity:allJobsById ) {
-            jobPostDto.add(JobPostDto.Response.builder()
+            jobPostDto.add(JobPostDto.JobPostResponse.builder()
                     .id(jobPostEntity.getId())
                     .title(jobPostEntity.getTitle())
                     .companyName(jobPostEntity.getCompanyName())
@@ -83,7 +83,7 @@ public class JobPostSvc {
         return new ResponseEntity<>(jobPostDto, HttpStatus.OK);
     }
 
-    public ResponseEntity<HttpStatus> changePostEntry(JobPostDto.UpdateRequest newEntry, Long id){
+    public ResponseEntity<HttpStatus> changePostEntry(JobPostDto.UpdateJobPostRequest newEntry, Long id){
         JobPostEntity oldEntry = jobPostRepo.findById(id).orElseThrow(() ->{ log.error("Job Post Not Found With Id: {}", id);
             return new NullPointerException();});
         SecurityContext context = SecurityContextHolder.getContext();
@@ -156,7 +156,7 @@ public class JobPostSvc {
                     ResumeEntity resumeEntity = resumeRepo.findById(resumeId).orElseThrow(()->{ log.error("Resume not found with Id {}", resumeId);
                         return new NullPointerException();});
 
-                    ResumeDto.EmployerResponse resumeDto = ResumeDto.EmployerResponse.builder()
+                    ResumeDto.EmployerResumeResponse resumeDto = ResumeDto.EmployerResumeResponse.builder()
                             .fullName(resumeEntity.getFullName())
                             .professionalTitle(resumeEntity.getProfessionalTitle())
                             .skills(resumeEntity.getSkills())

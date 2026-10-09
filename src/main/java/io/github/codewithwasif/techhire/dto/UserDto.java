@@ -1,7 +1,6 @@
 package io.github.codewithwasif.techhire.dto;
 
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Builder;
@@ -11,7 +10,7 @@ import lombok.Data;
 public final class UserDto {
     private UserDto(){}
 
-    public record CreateUserRequestDto(
+    public record CreateUserRequest(
             @NotBlank(message = "Username cannot be empty")
             @Size(min = 2, max = 20, message = "Username must be between 2 and 20 characters")
             String userName,
@@ -26,7 +25,7 @@ public final class UserDto {
 
 
 
-    public record LoginUserRequestDto(
+    public record LoginRequest(
             @NotBlank(message = "Username cannot be empty")
             String userName,
 
@@ -35,7 +34,7 @@ public final class UserDto {
 
 
     @Builder
-    public record UserResponseDto(
+    public record UserResponse(
             String userName,
             String email) {}
 }

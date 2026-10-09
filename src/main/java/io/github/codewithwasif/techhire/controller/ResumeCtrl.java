@@ -26,16 +26,16 @@ public class ResumeCtrl {
             summary = "Create the resume",
             description = "Allows an developer to create resume for the job")
     @PostMapping("/upload-resume")
-    public ResponseEntity<HttpStatus> uploadResume(@Valid @RequestBody ResumeDto resumeDto) {
-        return resumeSvc.uploadResume(resumeDto);
+    public ResponseEntity<HttpStatus> uploadResume(@Valid @RequestBody ResumeDto.CreateResumeRequest createRequest) {
+        return resumeSvc.uploadResume(createRequest);
     }
 
     @Operation(
             summary = "Get all the resumes",
             description = "Allows an developer to see all his resumes")
     @GetMapping("/get-resumes")
-    public ResponseEntity<List<ResumeDto>> getResumes() {
-        List<ResumeDto> resumes = resumeSvc.getResumes();
+    public ResponseEntity<List<ResumeDto.ResumeResponse>> getResumes() {
+        List<ResumeDto.ResumeResponse> resumes = resumeSvc.getResumes();
         return ResponseEntity.status(HttpStatus.OK).body(resumes);
     }
 }

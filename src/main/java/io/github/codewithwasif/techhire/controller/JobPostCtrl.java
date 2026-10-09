@@ -26,7 +26,7 @@ public class JobPostCtrl {
             summary = "Create a new job post",
             description = "Allows an employer to create a new job posting by providing job details.")
     @PostMapping("/post-job")
-    public ResponseEntity<HttpStatus> createJob(@Valid @RequestBody JobPostDto.CreateRequest createRequest){
+    public ResponseEntity<HttpStatus> createJob(@Valid @RequestBody JobPostDto.CreateJobPostRequest createRequest){
         return jobPostSvc.createJob(createRequest);
     }
 
@@ -34,7 +34,7 @@ public class JobPostCtrl {
             summary = "Get all job posts",
             description = "Allows an employer to see all his job posts")
     @GetMapping("/my-jobs")
-    public ResponseEntity<List<JobPostDto.Response>> getMyJobs(){
+    public ResponseEntity<List<JobPostDto.JobPostResponse>> getMyJobs(){
         return jobPostSvc.getMyJobs();
     }
 
@@ -42,7 +42,7 @@ public class JobPostCtrl {
             summary = "Update an existing job post",
             description = "Enables an employer to update the details of a job post by specifying its ID.")
     @PutMapping("/update-entry/{id}")
-    public ResponseEntity<HttpStatus> changePostEntry(@RequestBody JobPostDto.UpdateRequest updateRequest, @PathVariable Long id){
+    public ResponseEntity<HttpStatus> changePostEntry(@Valid @RequestBody JobPostDto.UpdateJobPostRequest updateRequest, @PathVariable Long id){
        return jobPostSvc.changePostEntry(updateRequest, id);
     }
 

@@ -29,7 +29,7 @@ public class UserSvc {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<UserDto.UserResponseDto> createDev(UserDto.CreateUserRequestDto userRequestDto){
+    public ResponseEntity<UserDto.UserResponse> createDev(UserDto.CreateUserRequest userRequestDto){
         try {
             UserEntity user = UserEntity.builder().userName(userRequestDto.userName())
                     .email(userRequestDto.email())
@@ -38,7 +38,7 @@ public class UserSvc {
                     .build();
             userRepo.save(user);
 
-            UserDto.UserResponseDto userResponseDto = UserDto.UserResponseDto.builder()
+            UserDto.UserResponse userResponseDto = UserDto.UserResponse.builder()
                     .userName(user.getUserName())
                     .email(user.getEmail())
                     .build();
@@ -50,7 +50,7 @@ public class UserSvc {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<UserDto.UserResponseDto> createEmp(UserDto.CreateUserRequestDto userRequestDto){
+    public ResponseEntity<UserDto.UserResponse> createEmp(UserDto.CreateUserRequest userRequestDto){
         try {
             UserEntity user = UserEntity.builder().userName(userRequestDto.userName())
                     .email(userRequestDto.email())
@@ -59,7 +59,7 @@ public class UserSvc {
                     .build();
             userRepo.save(user);
 
-            UserDto.UserResponseDto userResponseDto = UserDto.UserResponseDto.builder()
+            UserDto.UserResponse userResponseDto = UserDto.UserResponse.builder()
                     .userName(user.getUserName())
                     .email(user.getEmail())
                     .build();
@@ -72,7 +72,7 @@ public class UserSvc {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    public ResponseEntity<String> login(UserDto.LoginUserRequestDto userRequestDto){
+    public ResponseEntity<String> login(UserDto.LoginRequest userRequestDto){
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     userRequestDto.userName(), userRequestDto.password()));
