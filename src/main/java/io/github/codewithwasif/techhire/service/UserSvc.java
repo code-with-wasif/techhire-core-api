@@ -6,10 +6,7 @@ import io.github.codewithwasif.techhire.repository.UserRepo;
 import io.github.codewithwasif.techhire.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -29,8 +26,8 @@ public class UserSvc {
     private final JwtUtils jwtUtils;
     private final PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<UserDto.UserResponse> createDev(UserDto.CreateUserRequest userRequestDto){
-        try {
+    public UserDto.UserResponse createDev(UserDto.CreateUserRequest userRequestDto){
+
             UserEntity user = UserEntity.builder().userName(userRequestDto.userName())
                     .email(userRequestDto.email())
                     .password(passwordEncoder.encode(userRequestDto.password()))
@@ -38,20 +35,14 @@ public class UserSvc {
                     .build();
             userRepo.save(user);
 
-            UserDto.UserResponse userResponseDto = UserDto.UserResponse.builder()
-                    .userName(user.getUserName())
-                    .email(user.getEmail())
-                    .build();
-
-            return new ResponseEntity<>(userResponseDto, HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.error("Error while creating user {}",userRequestDto.userName(),e);
+        return UserDto.UserResponse.builder()
+                .userName(user.getUserName())
+                .email(user.getEmail())
+                .build();
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
 
-    public ResponseEntity<UserDto.UserResponse> createEmp(UserDto.CreateUserRequest userRequestDto){
-        try {
+    public UserDto.UserResponse createEmp(UserDto.CreateUserRequest userRequestDto){
+
             UserEntity user = UserEntity.builder().userName(userRequestDto.userName())
                     .email(userRequestDto.email())
                     .password(passwordEncoder.encode(userRequestDto.password()))
@@ -59,21 +50,14 @@ public class UserSvc {
                     .build();
             userRepo.save(user);
 
-            UserDto.UserResponse userResponseDto = UserDto.UserResponse.builder()
-                    .userName(user.getUserName())
-                    .email(user.getEmail())
-                    .build();
-
-            return new ResponseEntity<>(userResponseDto, HttpStatus.CREATED);
-
-        } catch (Exception e) {
-           log.error("Error while creating user {}",userRequestDto.userName(),e);
+        return UserDto.UserResponse.builder()
+                .userName(user.getUserName())
+                .email(user.getEmail())
+                .build();
         }
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-    }
 
-    public ResponseEntity<String> login(UserDto.LoginRequest userRequestDto){
-        try {
+    public String login(UserDto.LoginRequest userRequestDto){
+
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     userRequestDto.userName(), userRequestDto.password()));
 
@@ -82,16 +66,8 @@ public class UserSvc {
                     .map(GrantedAuthority::getAuthority)
                     .toList();
 
-            String token = jwtUtils.generateToken(userRequestDto.userName(), roles);
-            return new ResponseEntity<>(token, HttpStatus.OK);
+            return jwtUtils.generateToken(userRequestDto.userName(), roles);
 
-        } catch (BadCredentialsException e){
-            log.warn("Failed login attempt for user: {}", userRequestDto.userName(), e);
-            return new ResponseEntity<>( HttpStatus.UNAUTHORIZED);
-        } catch (Exception e) {
-            log.error("Error during login", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
     }
 

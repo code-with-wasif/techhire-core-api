@@ -28,6 +28,7 @@ public class JobSearchCtrl {
     public ResponseEntity<List<JobPostDto.JobPostResponse>> customSearch(@RequestParam(required = false) String techStack,
                                                          @RequestParam(required = false) Integer
                                                                     minSalary){
-        return jobSearchSvc.customSearch(techStack, minSalary);
+        List<JobPostDto.JobPostResponse> responses = jobSearchSvc.customSearch(techStack, minSalary);
+        return ResponseEntity.ok(responses);
     }
 }

@@ -4,8 +4,6 @@ import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.repository.JobPostRepo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,11 +15,11 @@ public class JobSearchSvc {
 
     private final JobPostRepo jobPostRepo;
 
-    public ResponseEntity<List<JobPostDto.JobPostResponse>> customSearch(String techStack, Integer minSalary){
+    public List<JobPostDto.JobPostResponse> customSearch(String techStack, Integer minSalary) {
         List<JobPostEntity> employerEntities = jobPostRepo.customJobsSearch(techStack, minSalary);
         List<JobPostDto.JobPostResponse> result = new ArrayList<>();
-        if (!employerEntities.isEmpty()) {
-            for (JobPostEntity all:employerEntities) {
+
+            for (JobPostEntity all : employerEntities) {
                 result.add(JobPostDto.JobPostResponse.builder()
                         .id(all.getId())
                         .title(all.getTitle())
@@ -33,8 +31,7 @@ public class JobSearchSvc {
                         .status(all.getStatus())
                         .build());
             }
-            return new ResponseEntity<>(result, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+
+        return result;
     }
 }
