@@ -20,6 +20,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -184,7 +185,7 @@ public class GlobalExceptionHandler {
             HttpStatus status, String message, String path, Map<String, String> validationErrors) {
 
         ErrorResponseDto response = new ErrorResponseDto(
-                LocalDateTime.now(),
+                LocalDateTime.now(ZoneOffset.UTC),
                 status.value(),
                 status.getReasonPhrase(),
                 message,
