@@ -26,8 +26,10 @@ public class JobPostCtrl {
             summary = "Create a new job post",
             description = "Allows an employer to create a new job posting by providing job details.")
     @PostMapping("/post-job")
-    public ResponseEntity<HttpStatus> createJob(@Valid @RequestBody JobPostDto.CreateJobPostRequest createRequest){
-        return jobPostSvc.createJob(createRequest);
+    public ResponseEntity<JobPostDto.CreateJobPostRequest> createJob(@Valid @RequestBody JobPostDto.CreateJobPostRequest createRequest){
+        JobPostDto.CreateJobPostRequest response = jobPostSvc.createJob(createRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(response);
     }
 
     @Operation(
@@ -35,23 +37,26 @@ public class JobPostCtrl {
             description = "Allows an employer to see all his job posts")
     @GetMapping("/my-jobs")
     public ResponseEntity<List<JobPostDto.JobPostResponse>> getMyJobs(){
-        return jobPostSvc.getMyJobs();
+        List<JobPostDto.JobPostResponse> response = jobPostSvc.getMyJobs();
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
             summary = "Update an existing job post",
             description = "Enables an employer to update the details of a job post by specifying its ID.")
     @PutMapping("/update-entry/{id}")
-    public ResponseEntity<HttpStatus> changePostEntry(@Valid @RequestBody JobPostDto.UpdateJobPostRequest updateRequest, @PathVariable Long id){
-       return jobPostSvc.changePostEntry(updateRequest, id);
+    public ResponseEntity<JobPostDto.UpdateJobPostRequest> changePostEntry(@Valid @RequestBody JobPostDto.UpdateJobPostRequest updateRequest, @PathVariable Long id){
+        JobPostDto.UpdateJobPostRequest response = jobPostSvc.changePostEntry(updateRequest, id);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(
             summary = "Delete a job post",
             description = "Allows an employer to delete a job post by providing its ID.")
     @DeleteMapping("/delete-post/{id}")
-    public ResponseEntity<HttpStatus> deleteJobPost(@PathVariable Long id){
-        return jobPostSvc.deleteJobPost(id);
+    public ResponseEntity<Void> deleteJobPost(@PathVariable Long id){
+        jobPostSvc.deleteJobPost(id);
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(
@@ -59,6 +64,7 @@ public class JobPostCtrl {
             description = "Lists all applicants who applied for a specific job post by its ID.")
     @GetMapping("/get-all-applicants/{id}")
     public ResponseEntity<List<JobPostDto.ApplicantReviewResponse>> getApplicantsById(@PathVariable Long id){
-       return jobPostSvc.getApplicantsById(id);
+        List<JobPostDto.ApplicantReviewResponse> responses = jobPostSvc.getApplicantsById(id);
+       return ResponseEntity.ok(responses);
     }
 }

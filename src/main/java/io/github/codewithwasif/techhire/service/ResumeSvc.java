@@ -4,13 +4,10 @@ import io.github.codewithwasif.techhire.dto.ResumeDto;
 import io.github.codewithwasif.techhire.entity.ResumeEntity;
 import io.github.codewithwasif.techhire.entity.UserEntity;
 import io.github.codewithwasif.techhire.repository.ResumeRepo;
-import io.github.codewithwasif.techhire.repository.UserRepo;
+import io.github.codewithwasif.techhire.utils.SecurityUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,14 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 public class ResumeSvc {
-    private final UserRepo userRepo;
     private final ResumeRepo resumeRepo;
+    private final SecurityUtils securityUtils;
 
     @Transactional
-    public ResponseEntity<HttpStatus> uploadResume(ResumeDto.CreateResumeRequest createRequest){
-        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity candidate = userRepo.findByUserName(userName);
-        try {
+    public ResumeDto.CreateResumeRequest uploadResume(ResumeDto.CreateResumeRequest createRequest){
+        UserEntity candidate = securityUtils.getCurrentUser();
+
             ResumeEntity resume = ResumeEntity.builder()
                     .fullName(createRequest.fullName())
                     .professionalTitle(createRequest.professionalTitle())
@@ -37,17 +33,14 @@ public class ResumeSvc {
                     .candidateDetails(candidate)
                     .build();
             resumeRepo.save(resume);
-            return new ResponseEntity<>(HttpStatus.CREATED);
-        } catch (Exception e) {
-            log.error("Error While Creating Resume", e);
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            return createRequest;
         }
-    }
 
     public List<ResumeDto.ResumeResponse> getResumes(){
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        UserEntity candidate = userRepo.findByUserName(username);
+
+        UserEntity candidate = securityUtils.getCurrentUser();
         long id = candidate.getId();
+
         List<ResumeEntity> resumeList = resumeRepo.getAllResumesById(id);
         List<ResumeDto.ResumeResponse> responseList = new ArrayList<>();
         for (ResumeEntity resume: resumeList){

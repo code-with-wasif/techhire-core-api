@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +28,8 @@ public class UserCtrl {
             description = "Registers a new developer account by providing user details in the request body.")
     @PostMapping("/sign-up/dev")
     public ResponseEntity<UserDto.UserResponse> devSignUp(@Valid @RequestBody UserDto.CreateUserRequest userRequestDto){
-        return userSvc.createDev(userRequestDto);
+        UserDto.UserResponse response = userSvc.createDev(userRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(
@@ -35,7 +37,8 @@ public class UserCtrl {
             description = "Registers a new employer account by providing user details in the request body.")
     @PostMapping("/sign-up/emp")
     public ResponseEntity<UserDto.UserResponse> empSignUp(@Valid @RequestBody UserDto.CreateUserRequest userRequestDto){
-        return userSvc.createEmp(userRequestDto);
+        UserDto.UserResponse response = userSvc.createEmp(userRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @Operation(
@@ -43,6 +46,8 @@ public class UserCtrl {
             description = "Authenticates a user by verifying their username and password, returning a token if successful.")
     @PostMapping("/login")
     public ResponseEntity<String> loginDev(@Valid @RequestBody UserDto.LoginRequest userRequestDto){
-        return userSvc.login(userRequestDto);
+        String login = userSvc.login(userRequestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(login);
+
     }
 }
