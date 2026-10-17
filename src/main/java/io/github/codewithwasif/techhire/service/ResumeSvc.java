@@ -6,12 +6,13 @@ import io.github.codewithwasif.techhire.entity.UserEntity;
 import io.github.codewithwasif.techhire.mapper.ResumeMapper;
 import io.github.codewithwasif.techhire.repository.ResumeRepo;
 import io.github.codewithwasif.techhire.utils.SecurityUtils;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class ResumeSvc {

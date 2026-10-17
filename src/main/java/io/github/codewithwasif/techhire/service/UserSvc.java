@@ -13,9 +13,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional(readOnly = true)
 @Service
 @RequiredArgsConstructor
 public class UserSvc {
@@ -26,6 +28,7 @@ public class UserSvc {
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
+    @Transactional
     public UserDto.UserResponse createDev(UserDto.CreateUserRequest userRequestDto){
 
         String password = passwordEncoder.encode(userRequestDto.password());
@@ -38,6 +41,7 @@ public class UserSvc {
         return userMapper.toResponse(savedUser);
     }
 
+    @Transactional
     public UserDto.UserResponse createEmp(UserDto.CreateUserRequest userRequestDto){
 
         String password = passwordEncoder.encode(userRequestDto.password());

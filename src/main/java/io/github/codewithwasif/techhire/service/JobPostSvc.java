@@ -3,8 +3,10 @@ package io.github.codewithwasif.techhire.service;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.entity.JobApplyEntity;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
+import io.github.codewithwasif.techhire.entity.ResumeEntity;
 import io.github.codewithwasif.techhire.entity.UserEntity;
 import io.github.codewithwasif.techhire.mapper.JobPostMapper;
+import io.github.codewithwasif.techhire.repository.ResumeRepo;
 import org.springframework.security.access.AccessDeniedException;
 import io.github.codewithwasif.techhire.exception.BadRequestException;
 import io.github.codewithwasif.techhire.exception.ResourceNotFoundException;
@@ -14,15 +16,20 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class JobPostSvc {
 
     private final JobPostRepo jobPostRepo;
     private final SecurityUtils securityUtils;
     private final JobPostMapper jobPostMapper;
+    private final ResumeRepo resumeRepo;
 
     @Transactional
     public JobPostDto.JobPostResponse createJob(JobPostDto.CreateJobPostRequest createRequest){
@@ -45,6 +52,7 @@ public class JobPostSvc {
         return jobPostMapper.toGetAllPosts(allJobsById);
     }
 
+    @Transactional
     public JobPostDto.JobPostResponse changePostEntry(JobPostDto.UpdateJobPostRequest request, Long id){
         JobPostEntity existingPost = fetchJobPostById(id);
         UserEntity employer = securityUtils.getCurrentUser();
@@ -56,16 +64,17 @@ public class JobPostSvc {
 
         jobPostMapper.updateEntityFromDto(request, existingPost);
 
-        JobPostEntity savedPost = jobPostRepo.save(existingPost);
+        JobPostEntity savedPost = jobPostRepo.saveAndFlush(existingPost);
         return jobPostMapper.toResponse(savedPost);
         }
 
+    @Transactional
     public void deleteJobPost(Long id) {
 
         UserEntity employer = securityUtils.getCurrentUser();
         JobPostEntity jobToDelete = fetchJobPostById(id);
         validateOwnership(jobToDelete, employer);
-        jobPostRepo.deleteById(id);
+        jobPostRepo.delete(jobToDelete);
     }
 
     public List<JobPostDto.ApplicantReviewResponse> getApplicantsById(Long id){
@@ -75,7 +84,18 @@ public class JobPostSvc {
 
         List<JobApplyEntity> applicants = jobOfApplicants.getApplications();
 
-        return jobPostMapper.toApplicantReviewResponse(applicants);
+        List<Long> resumeId = new ArrayList<>();
+        for(JobApplyEntity key : applicants){
+            resumeId.add(key.getResumeId());
+        }
+
+        List<ResumeEntity> resumes = resumeRepo.findAllById(resumeId);
+        Map<Long, ResumeEntity> resumeMap = new HashMap<>();
+        for(ResumeEntity resume : resumes){
+            resumeMap.put(resume.getId(), resume);
+        }
+
+        return jobPostMapper.toApplicantReviewResponse(applicants, resumeMap);
     }
 
 

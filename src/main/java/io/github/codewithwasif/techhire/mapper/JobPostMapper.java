@@ -7,22 +7,22 @@ import io.github.codewithwasif.techhire.entity.JobApplyEntity;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
 import io.github.codewithwasif.techhire.entity.ResumeEntity;
 import io.github.codewithwasif.techhire.entity.UserEntity;
-import io.github.codewithwasif.techhire.exception.ResourceNotFoundException;
-import io.github.codewithwasif.techhire.repository.ResumeRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
 public class JobPostMapper {
 
-    private final ResumeRepo resumeRepo;
-
     public JobPostEntity toEntity(JobPostDto.CreateJobPostRequest createRequest, UserEntity employer) {
+        if (createRequest == null) return null;
+
         return JobPostEntity.builder().title(createRequest.title())
                 .companyName(createRequest.companyName())
                 .description(createRequest.description())
@@ -35,6 +35,8 @@ public class JobPostMapper {
     }
 
     public JobPostDto.JobPostResponse toResponse(JobPostEntity jobPostEntity) {
+        if (jobPostEntity == null) return null;
+
         return JobPostDto.JobPostResponse.builder()
                 .id(jobPostEntity.getId())
                 .title(jobPostEntity.getTitle())
@@ -50,9 +52,14 @@ public class JobPostMapper {
     }
 
     public List<JobPostDto.JobPostResponse> toGetAllPosts(List<JobPostEntity> allJobsById) {
+        if (allJobsById == null || allJobsById.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<JobPostDto.JobPostResponse> jobPostDto = new ArrayList<>();
 
         for (JobPostEntity jobPostEntity : allJobsById) {
+            if (jobPostEntity == null) continue;
             jobPostDto.add(toResponse(jobPostEntity));
         }
         return jobPostDto;
@@ -87,22 +94,25 @@ public class JobPostMapper {
     }
 
 
-    public List<JobPostDto.ApplicantReviewResponse> toApplicantReviewResponse(List<JobApplyEntity> applicants) {
+    public List<JobPostDto.ApplicantReviewResponse> toApplicantReviewResponse(List<JobApplyEntity> applicants, Map<Long, ResumeEntity> resumes) {
+        if (applicants == null || applicants.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<JobPostDto.ApplicantReviewResponse> applicantReviewResponses = new ArrayList<>();
 
         for (JobApplyEntity applyDto : applicants) {
+            if (applyDto == null) continue;
 
-            Long resumeId = applyDto.getResumeId();
-            ResumeEntity resumeEntity = resumeRepo.findById(resumeId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Resume not found with Id " + resumeId));
+            ResumeEntity resumeEntity = resumes != null ? resumes.get(applyDto.getResumeId()) : null;
 
-            ResumeDto.EmployerResumeResponse resumeDto = ResumeDto.EmployerResumeResponse.builder()
+            ResumeDto.EmployerResumeResponse resumeDto = resumeEntity != null ? ResumeDto.EmployerResumeResponse.builder()
                     .fullName(resumeEntity.getFullName())
                     .professionalTitle(resumeEntity.getProfessionalTitle())
                     .skills(resumeEntity.getSkills())
                     .portfolioUrl(resumeEntity.getPortfolioUrl())
                     .bio(resumeEntity.getBio())
-                    .build();
+                    .build() : null;
 
             JobApplyDto.EmployerResponse applicantsDto = JobApplyDto.EmployerResponse.builder()
                     .coverLetterMessage(applyDto.getCoverLetterMessage())
@@ -115,9 +125,14 @@ public class JobPostMapper {
     }
 
     public List<JobPostDto.ShowAllPostsResponse> toShowAllPostsResponse(List<JobPostEntity> employerEntities) {
+        if (employerEntities == null || employerEntities.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<JobPostDto.ShowAllPostsResponse> result = new ArrayList<>();
 
         for (JobPostEntity all : employerEntities) {
+            if (all == null) continue;
 
             JobPostDto.ShowAllPostsResponse build = JobPostDto.ShowAllPostsResponse.builder()
                     .id(all.getId())

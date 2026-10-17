@@ -12,6 +12,7 @@ public class JobApplyMapper {
     public JobApplyEntity toEntity(JobApplyDto.CreateApplicationRequest createApplicationRequest,
                                    JobPostEntity jobToApply,
                                    UserEntity applicant){
+        if(createApplicationRequest == null) return null;
         return JobApplyEntity.builder()
                 .coverLetterMessage(createApplicationRequest.coverLetterMessage())
                 .applicationStatus("PENDING")
