@@ -13,6 +13,7 @@ import java.util.List;
 public class ResumeMapper {
 
     public ResumeEntity toEntity(ResumeDto.CreateResumeRequest createRequest, UserEntity candidate){
+        if (createRequest == null) return null;
         return ResumeEntity.builder()
                 .fullName(createRequest.fullName())
                 .professionalTitle(createRequest.professionalTitle())
@@ -24,6 +25,7 @@ public class ResumeMapper {
     }
 
     public ResumeDto.ResumeResponse toResponse(ResumeEntity resume){
+        if (resume == null) return null;
         return ResumeDto.ResumeResponse.builder()
                 .id(resume.getId())
                 .fullName(resume.getFullName())

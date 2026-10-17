@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class JobApplySvc {
 
     private final JobPostRepo jobPostRepo;
@@ -35,6 +36,5 @@ public class JobApplySvc {
 
         return jobApplyMapper.toResponse(savedApplication);
         }
-
     }
 

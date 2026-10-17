@@ -10,6 +10,7 @@ import java.util.List;
 public class UserMapper {
 
     public UserEntity toEntity(UserDto.CreateUserRequest userRequestDto, String encodedPassword, List<String> role){
+        if (userRequestDto == null) return null;
         return UserEntity.builder().userName(userRequestDto.userName())
                 .email(userRequestDto.email())
                 .password(encodedPassword)
@@ -18,6 +19,7 @@ public class UserMapper {
     }
 
     public UserDto.UserResponse toResponse(UserEntity user){
+        if (user == null) return null;
         return UserDto.UserResponse.builder()
                 .id(user.getId())
                 .userName(user.getUserName())
