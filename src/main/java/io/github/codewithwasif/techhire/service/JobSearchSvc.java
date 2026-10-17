@@ -2,11 +2,11 @@ package io.github.codewithwasif.techhire.service;
 
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
+import io.github.codewithwasif.techhire.mapper.JobPostMapper;
 import io.github.codewithwasif.techhire.repository.JobPostRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -14,24 +14,10 @@ import java.util.List;
 public class JobSearchSvc {
 
     private final JobPostRepo jobPostRepo;
+    private final JobPostMapper jobPostMapper;
 
-    public List<JobPostDto.JobPostResponse> customSearch(String techStack, Integer minSalary) {
-        List<JobPostEntity> employerEntities = jobPostRepo.customJobsSearch(techStack, minSalary);
-        List<JobPostDto.JobPostResponse> result = new ArrayList<>();
-
-            for (JobPostEntity all : employerEntities) {
-                result.add(JobPostDto.JobPostResponse.builder()
-                        .id(all.getId())
-                        .title(all.getTitle())
-                        .companyName(all.getCompanyName())
-                        .description(all.getDescription())
-                        .minSalary(all.getMinSalary())
-                        .maxSalary(all.getMaxSalary())
-                        .techStack(all.getTechStack())
-                        .status(all.getStatus())
-                        .build());
-            }
-
-        return result;
+    public List<JobPostDto.ShowAllPostsResponse> customSearch(String techStack, Integer minSalary) {
+        List<JobPostEntity> jobs = jobPostRepo.customJobsSearch(techStack, minSalary);
+        return jobPostMapper.toShowAllPostsResponse(jobs);
     }
 }

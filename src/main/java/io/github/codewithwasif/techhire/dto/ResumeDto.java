@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import org.hibernate.validator.constraints.URL;
 
+import java.time.LocalDateTime;
 
 
 public final class ResumeDto {
@@ -26,7 +27,9 @@ public final class ResumeDto {
             String professionalTitle,
             String skills,
             String portfolioUrl,
-            String bio
+            String bio,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt
     ) {}
 
     @Builder
