@@ -24,8 +24,8 @@ public class JobApplyCtrl {
             summary = "Apply for a job post",
             description = "Allows an developer to apply for a specific job post by providing its ID and application details.")
     @PostMapping("/job-apply/{id}")
-    public ResponseEntity<JobApplyDto.CreateApplicationRequest> applyJob(@PathVariable Long id, @Valid @RequestBody JobApplyDto.CreateApplicationRequest createApplicationRequest){
-        JobApplyDto.CreateApplicationRequest response = jobApplySvc.applyJob(id, createApplicationRequest);
+    public ResponseEntity<JobApplyDto.ApplicationResponse> applyJob(@PathVariable Long id, @Valid @RequestBody JobApplyDto.CreateApplicationRequest createApplicationRequest){
+        JobApplyDto.ApplicationResponse response = jobApplySvc.applyJob(id, createApplicationRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

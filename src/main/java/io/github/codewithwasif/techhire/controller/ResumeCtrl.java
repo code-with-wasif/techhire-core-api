@@ -26,8 +26,8 @@ public class ResumeCtrl {
             summary = "Create the resume",
             description = "Allows an developer to create resume for the job")
     @PostMapping("/upload-resume")
-    public ResponseEntity<ResumeDto.CreateResumeRequest> uploadResume(@Valid @RequestBody ResumeDto.CreateResumeRequest createRequest) {
-        ResumeDto.CreateResumeRequest response = resumeSvc.uploadResume(createRequest);
+    public ResponseEntity<ResumeDto.ResumeResponse> uploadResume(@Valid @RequestBody ResumeDto.CreateResumeRequest createRequest) {
+        ResumeDto.ResumeResponse response = resumeSvc.uploadResume(createRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

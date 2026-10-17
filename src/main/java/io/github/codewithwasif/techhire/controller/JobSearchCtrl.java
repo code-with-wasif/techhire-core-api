@@ -25,10 +25,10 @@ public class JobSearchCtrl {
     @Operation(summary = "Discover active jobs",
             description = "Use optional query parameters to filter the results. If no parameters are provided, it returns all currently active jobs.")
     @GetMapping
-    public ResponseEntity<List<JobPostDto.JobPostResponse>> customSearch(@RequestParam(required = false) String techStack,
-                                                         @RequestParam(required = false) Integer
+    public ResponseEntity<List<JobPostDto.ShowAllPostsResponse>> customSearch(@RequestParam(required = false) String techStack,
+                                                                              @RequestParam(required = false) Integer
                                                                     minSalary){
-        List<JobPostDto.JobPostResponse> responses = jobSearchSvc.customSearch(techStack, minSalary);
+        List<JobPostDto.ShowAllPostsResponse> responses = jobSearchSvc.customSearch(techStack, minSalary);
         return ResponseEntity.ok(responses);
     }
 }

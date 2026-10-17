@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Size;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public final class UserDto {
     private UserDto(){}
@@ -36,5 +38,8 @@ public final class UserDto {
     @Builder
     public record UserResponse(
             String userName,
-            String email) {}
+            String email,
+            Long id,
+            LocalDateTime createdAt,
+            LocalDateTime updatedAt) {}
 }

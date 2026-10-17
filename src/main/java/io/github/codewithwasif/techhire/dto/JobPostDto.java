@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -31,7 +33,14 @@ public final class JobPostDto {
     @Builder
     public record JobPostResponse( Long id, String title, String companyName, String description,
                             Integer minSalary, Integer maxSalary,
-                            List<String> techStack, String status
+                            List<String> techStack, String status, LocalDateTime createdAt,
+                                   LocalDateTime updatedAt
+    ) {}
+
+    @Builder
+    public record ShowAllPostsResponse( Long id, String title, String companyName, String description,
+                                   Integer minSalary, Integer maxSalary,
+                                   List<String> techStack, String status, LocalDateTime createdAt
     ) {}
 
     public record ApplicantReviewResponse(
