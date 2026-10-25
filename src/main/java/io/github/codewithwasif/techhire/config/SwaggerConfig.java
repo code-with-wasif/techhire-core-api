@@ -24,7 +24,7 @@ public class SwaggerConfig {
                 )
 
                 .servers(List.of(
-                        new Server().url("https://code-with-wasif-techhire-api.hf.space").description("Production server"),
+                        new Server().url("https://techhire-api.duckdns.org").description("Production server"),
                         new Server().url("http://localhost:8080").description("Local development")
                 ))
 

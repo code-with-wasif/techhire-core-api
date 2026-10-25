@@ -1,4 +1,4 @@
-name: Sync to Hugging Face Space
+name: Deploy to Oracle Cloud VM
 
 on:
   push:
@@ -6,24 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  sync-to-hub:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Trigger Deployment on VM via SSH
+        uses: appleboy/ssh-action@v1.0.3
         with:
-          fetch-depth: 0
-          lfs: true
-
-      - name: Swap and Commit Hugging Face README
-        run: |
-            cp hf-readme.md README.md
-            git config --global user.name "GitHub Actions"
-            git config --global user.email "actions@github.com"
-            git add README.md
-            git diff-index --quiet HEAD || git commit -m "chore: inject Hugging Face config block"     
-
-      - name: Push to Hugging Face
-        env:
-          HF_TOKEN: ${{ secrets.HF_TOKEN }}
-
-        run: git push --force https://code-with-wasif:$HF_TOKEN@huggingface.co/spaces/code-with-wasif/techhire-api main
+          host: ${{ secrets.ORACLE_VM_HOST }}
+          username: ${{ secrets.ORACLE_VM_USER }}
+          key: ${{ secrets.ORACLE_VM_KEY }}
+          port: 22
+          script: |
+            bash ~/app/deploy.sh
