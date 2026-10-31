@@ -45,9 +45,8 @@ public class UserCtrl {
             summary = "User login",
             description = "Authenticates a user by verifying their username and password, returning a token if successful.")
     @PostMapping("/login")
-    public ResponseEntity<String> loginDev(@Valid @RequestBody UserDto.LoginRequest userRequestDto){
-        String login = userSvc.login(userRequestDto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(login);
-
+    public ResponseEntity<UserDto.LoginResponse> loginDev(@Valid @RequestBody UserDto.LoginRequest userRequestDto){
+        UserDto.LoginResponse login = userSvc.login(userRequestDto);
+        return ResponseEntity.ok(login);
     }
 }

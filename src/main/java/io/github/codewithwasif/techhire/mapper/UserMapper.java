@@ -28,4 +28,13 @@ public class UserMapper {
                 .updatedAt(user.getUpdatedAt())
                 .build();
     }
+
+    public UserDto.LoginResponse toLoginResponse(String token, String type, long expiry) {
+
+        return UserDto.LoginResponse.builder()
+                .accessToken(token)
+                .tokenType(type)
+                .expiresInSeconds(expiry)
+                .build();
+    }
 }

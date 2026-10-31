@@ -4,13 +4,10 @@ import io.github.codewithwasif.techhire.dto.UserDto;
 import io.github.codewithwasif.techhire.entity.UserEntity;
 import io.github.codewithwasif.techhire.mapper.UserMapper;
 import io.github.codewithwasif.techhire.repository.UserRepo;
-import io.github.codewithwasif.techhire.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +19,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserSvc {
 
+    private static final String BEARER_TOKEN_TYPE = "Bearer";
+
     private final UserRepo userRepo;
     private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final UserMapper userMapper;
 
@@ -32,7 +31,7 @@ public class UserSvc {
     public UserDto.UserResponse createDev(UserDto.CreateUserRequest userRequestDto){
 
         String password = passwordEncoder.encode(userRequestDto.password());
-        List<String> roles = List.of("DEVELOPER");
+        List<String> roles = List.of("ROLE_DEVELOPER");
 
         UserEntity user = userMapper.toEntity(userRequestDto, password, roles);
 
@@ -45,7 +44,7 @@ public class UserSvc {
     public UserDto.UserResponse createEmp(UserDto.CreateUserRequest userRequestDto){
 
         String password = passwordEncoder.encode(userRequestDto.password());
-        List<String> roles = List.of("EMPLOYER");
+        List<String> roles = List.of("ROLE_EMPLOYER");
 
         UserEntity user = userMapper.toEntity(userRequestDto, password, roles);
 
@@ -54,18 +53,17 @@ public class UserSvc {
         return userMapper.toResponse(savedUser);
     }
 
-    public String login(UserDto.LoginRequest userRequestDto){
+    public UserDto.LoginResponse login(UserDto.LoginRequest loginRequest) {
+        Authentication unauthenticatedToken = UsernamePasswordAuthenticationToken.unauthenticated(
+                loginRequest.userName(),
+                loginRequest.password()
+        );
 
-            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    userRequestDto.userName(), userRequestDto.password()));
+        Authentication authenticated = authenticationManager.authenticate(unauthenticatedToken);
 
-            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
-            List<String> roles = userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .toList();
+        String accessToken = jwtService.generateToken(authenticated);
 
-            return jwtUtils.generateToken(userRequestDto.userName(), roles);
-
+        return userMapper.toLoginResponse(accessToken, BEARER_TOKEN_TYPE ,jwtService.getExpirySeconds());
     }
 }
 

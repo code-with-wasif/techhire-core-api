@@ -2,7 +2,10 @@ spring:
   application:
     name: techhire-core-api
 
-  JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+  jwt:
+    secret: ${JWT_SECRET_KEY}
+    issuer: tech-hire-api
+    expiration-seconds: ${JWT_EXPIRY_SEC}
 
   datasource:
     url: ${POSTGRESQL_URL}
@@ -14,7 +17,7 @@ spring:
       database-platform: org.hibernate.dialect.PostgreSQLDialect
       show-sql: true
       hibernate:
-        ddl-auto: update
+        ddl-auto: create
       properties:
         hibernate:
           format_sql: true
