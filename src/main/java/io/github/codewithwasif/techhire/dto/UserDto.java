@@ -42,4 +42,11 @@ public final class UserDto {
             Long id,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {}
+
+    @Builder
+    public record LoginResponse(
+            String accessToken,
+            String tokenType,
+            long expiresInSeconds
+    ) {}
 }
