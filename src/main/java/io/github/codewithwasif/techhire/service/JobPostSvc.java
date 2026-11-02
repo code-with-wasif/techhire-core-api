@@ -16,10 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -30,6 +27,7 @@ public class JobPostSvc {
     private final SecurityUtils securityUtils;
     private final JobPostMapper jobPostMapper;
     private final ResumeRepo resumeRepo;
+    private final JobEmbeddingSvc jobEmbeddingSvc;
 
     @Transactional
     public JobPostDto.JobPostResponse createJob(JobPostDto.CreateJobPostRequest createRequest){
@@ -37,7 +35,9 @@ public class JobPostSvc {
 
         UserEntity employer = securityUtils.getCurrentUser();
 
-        JobPostEntity job = jobPostMapper.toEntity(createRequest, employer);
+        float[] embedding = jobEmbeddingSvc.generateEmbedding(createRequest);
+
+        JobPostEntity job = jobPostMapper.toEntity(createRequest, employer, embedding);
 
         JobPostEntity savedPost = jobPostRepo.save(job);
         return jobPostMapper.toResponse(savedPost);
@@ -62,7 +62,13 @@ public class JobPostSvc {
         int updatedMax = request.maxSalary() != null ? request.maxSalary() : existingPost.getMaxSalary();
         validateSalaryBounds(updatedMin, updatedMax);
 
-        jobPostMapper.updateEntityFromDto(request, existingPost);
+        Optional<float[]> embedding = jobEmbeddingSvc.generateEmbeddingIfDirty(request, existingPost);
+
+        if (embedding.isPresent()){
+        jobPostMapper.updateEntityFromDto(request, existingPost, embedding.get());
+        } else{
+            jobPostMapper.updateEntityFromDto(request, existingPost);
+        }
 
         JobPostEntity savedPost = jobPostRepo.saveAndFlush(existingPost);
         return jobPostMapper.toResponse(savedPost);
