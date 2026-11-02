@@ -43,6 +43,13 @@ public final class JobPostDto {
                                    List<String> techStack, String status, LocalDateTime createdAt
     ) {}
 
+    @Builder
+    public record RecommendedPosts( Long id, String title, String companyName, String description,
+                                        Integer minSalary, Integer maxSalary,
+                                        List<String> techStack, String status, LocalDateTime createdAt,
+                                        Double similarity
+    ) {}
+
     public record ApplicantReviewResponse(
             JobApplyDto.EmployerResponse application,
             ResumeDto.EmployerResumeResponse resume

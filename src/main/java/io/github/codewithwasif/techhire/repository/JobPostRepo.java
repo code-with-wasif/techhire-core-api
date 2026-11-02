@@ -9,7 +9,8 @@ import java.util.List;
 
 @Repository
 public interface JobPostRepo extends JpaRepository<JobPostEntity, Long> {
-    List<JobPostEntity> findByStatusIgnoreCase(String status);
+
+    List<JobPostEntity> findAllByStatus(String status);
 
     @Query("SELECT j FROM JobPostEntity j WHERE " +
             "(:techStack IS NULL OR :techStack MEMBER OF j.techStack) AND " +

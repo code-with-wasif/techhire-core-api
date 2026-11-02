@@ -91,10 +91,10 @@ public class SpringSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/jobs/**", "/user/**").permitAll()
+                        .requestMatchers("/jobs/search", "/user/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/employer/**").hasRole("EMPLOYER")
-                        .requestMatchers("/dev/**").hasRole("DEVELOPER")
+                        .requestMatchers("/dev/**", "jobs/**").hasRole("DEVELOPER")
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

@@ -6,7 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,6 +36,10 @@ public class JobPostEntity {
     private List<String> techStack;
 
     private String status;
+
+    @JdbcTypeCode(SqlTypes.ARRAY)
+    @Column(name = "embedding", columnDefinition = "float4[]")
+    private float[] embedding;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

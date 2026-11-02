@@ -17,10 +17,25 @@ spring:
       database-platform: org.hibernate.dialect.PostgreSQLDialect
       show-sql: true
       hibernate:
-        ddl-auto: create
+        ddl-auto: ${DDL_AUTO:update}
       properties:
         hibernate:
           format_sql: true
+
+  ai:
+    google:
+      genai:
+        api-key: ${GEMINI_API_KEY}
+        chat:
+          options:
+            model: ${GEMINI_CHAT_MODEL}
+
+        embedding:
+          api-key: ${GEMINI_API_KEY}
+          text:
+            options:
+              model: ${GEMINI_EMBEDDING_MODEL}
+
 
 
 #  data:

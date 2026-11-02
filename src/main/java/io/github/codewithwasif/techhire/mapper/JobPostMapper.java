@@ -20,7 +20,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class JobPostMapper {
 
-    public JobPostEntity toEntity(JobPostDto.CreateJobPostRequest createRequest, UserEntity employer) {
+    public JobPostEntity toEntity(JobPostDto.CreateJobPostRequest createRequest, UserEntity employer, float[] embedding) {
         if (createRequest == null) return null;
 
         return JobPostEntity.builder().title(createRequest.title())
@@ -31,6 +31,7 @@ public class JobPostMapper {
                 .techStack(createRequest.techStack())
                 .status(createRequest.status())
                 .employerDetails(employer)
+                .embedding(embedding)
                 .build();
     }
 
@@ -93,6 +94,15 @@ public class JobPostMapper {
         }
     }
 
+    public void updateEntityFromDto(JobPostDto.UpdateJobPostRequest request, JobPostEntity entity, float[] embedding) {
+        if (request == null || entity == null) {
+            return;
+        }
+        updateEntityFromDto(request, entity);
+        entity.setEmbedding(embedding);
+    }
+
+
 
     public List<JobPostDto.ApplicantReviewResponse> toApplicantReviewResponse(List<JobApplyEntity> applicants, Map<Long, ResumeEntity> resumes) {
         if (applicants == null || applicants.isEmpty()) {
@@ -149,5 +159,111 @@ public class JobPostMapper {
             result.add(build);
         }
         return result;
+    }
+
+    public List<JobPostDto.ShowAllPostsResponse> toShowAllRecommendedPostsResponse(List<JobPostDto.RecommendedPosts> recommendedPosts) {
+        if (recommendedPosts == null || recommendedPosts.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<JobPostDto.ShowAllPostsResponse> result = new ArrayList<>();
+
+        for (JobPostDto.RecommendedPosts all : recommendedPosts) {
+            if (all == null) continue;
+
+            JobPostDto.ShowAllPostsResponse build = JobPostDto.ShowAllPostsResponse.builder()
+                    .id(all.id())
+                    .title(all.title())
+                    .companyName(all.companyName())
+                    .description(all.description())
+                    .minSalary(all.minSalary())
+                    .maxSalary(all.maxSalary())
+                    .techStack(all.techStack())
+                    .status(all.status())
+                    .createdAt(all.createdAt())
+                    .build();
+
+            result.add(build);
+        }
+        return result;
+    }
+
+    public JobPostDto.RecommendedPosts toRecommendedPosts(JobPostEntity jobPost, Double similarity) {
+
+            return JobPostDto.RecommendedPosts.builder()
+                    .id(jobPost.getId())
+                    .title(jobPost.getTitle())
+                    .companyName(jobPost.getCompanyName())
+                    .description(jobPost.getDescription())
+                    .minSalary(jobPost.getMinSalary())
+                    .maxSalary(jobPost.getMaxSalary())
+                    .techStack(jobPost.getTechStack())
+                    .status(jobPost.getStatus())
+                    .createdAt(jobPost.getCreatedAt())
+                    .similarity(similarity)
+                    .build();
+    }
+
+    public String buildJobEmbeddingText(JobPostDto.CreateJobPostRequest request) {
+        if (request == null) return "";
+
+        String title = defaultIfBlank(request.title());
+        String techStack = formatTechStack(request.techStack());
+        String description = defaultIfBlank(request.description());
+
+        return formatEmbeddingTemplate(title, techStack, description);
+    }
+
+    public String buildJobEmbeddingText(JobPostEntity existing, JobPostDto.UpdateJobPostRequest update) {
+        if (existing == null && update == null) return "";
+
+        String title = resolveVal(
+                update != null ? update.title() : null,
+                existing != null ? existing.getTitle() : null
+        );
+
+        String description = resolveVal(
+                update != null ? update.description() : null,
+                existing != null ? existing.getDescription() : null
+        );
+
+        List<String> stack = (update != null && update.techStack() != null && !update.techStack().isEmpty())
+                ? update.techStack()
+                : (existing != null && existing.getTechStack() != null ? existing.getTechStack() : List.of());
+
+        String techStack = formatTechStack(stack);
+
+        return formatEmbeddingTemplate(title, techStack, description);
+    }
+
+
+
+    private String resolveVal(String updateVal, String existingVal) {
+        if (updateVal != null && !updateVal.isBlank()) {
+            return updateVal.trim();
+        }
+        if (existingVal != null && !existingVal.isBlank()) {
+            return existingVal.trim();
+        }
+        return "None";
+    }
+
+    private String formatTechStack(List<String> techStack) {
+        if (techStack == null || techStack.isEmpty()) {
+            return "None";
+        }
+        return String.join(", ", techStack);
+    }
+
+    private String formatEmbeddingTemplate(String title, String techStack, String description) {
+        return """
+    Job Title: %s
+    Required Tech Stack: %s
+    Job Responsibilities and Description: %s
+    """.formatted(title, techStack, description).trim();
+    }
+
+    private String defaultIfBlank(String value) {
+        return (value == null || value.isBlank()) ? "None" : value.trim();
     }
 }
