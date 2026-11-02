@@ -208,42 +208,59 @@ public class JobPostMapper {
         if (request == null) return "";
 
         String title = defaultIfBlank(request.title());
-        String techStack = (request.techStack() != null && !request.techStack().isEmpty())
-                ? String.join(", ", request.techStack())
-                : "None";
+        String techStack = formatTechStack(request.techStack());
         String description = defaultIfBlank(request.description());
 
-        return """
-        Job Title: %s
-        Required Tech Stack: %s
-        Job Responsibilities and Description: %s
-        """.formatted(title, techStack, description).trim();
+        return formatEmbeddingTemplate(title, techStack, description);
     }
 
-    public String buildJobEmbeddingText(JobPostEntity existingPost, JobPostDto.UpdateJobPostRequest updateRequest) {
-        if (existingPost == null && updateRequest == null) return "";
+    public String buildJobEmbeddingText(JobPostEntity existing, JobPostDto.UpdateJobPostRequest update) {
+        if (existing == null && update == null) return "";
 
-        String title = (updateRequest != null && updateRequest.title() != null && !updateRequest.title().isBlank())
-                ? updateRequest.title().trim()
-                : (existingPost != null ? defaultIfBlank(existingPost.getTitle()) : "None");
+        String title = resolveVal(
+                update != null ? update.title() : null,
+                existing != null ? existing.getTitle() : null
+        );
 
-        List<String> resolvedStack = (updateRequest != null && updateRequest.techStack() != null && !updateRequest.techStack().isEmpty())
-                ? updateRequest.techStack()
-                : (existingPost != null ? existingPost.getTechStack() : List.of());
+        String description = resolveVal(
+                update != null ? update.description() : null,
+                existing != null ? existing.getDescription() : null
+        );
 
-        String techStack = (resolvedStack != null && !resolvedStack.isEmpty())
-                ? String.join(", ", resolvedStack)
-                : "None";
+        List<String> stack = (update != null && update.techStack() != null && !update.techStack().isEmpty())
+                ? update.techStack()
+                : (existing != null && existing.getTechStack() != null ? existing.getTechStack() : List.of());
 
-        String description = (updateRequest != null && updateRequest.description() != null && !updateRequest.description().isBlank())
-                ? updateRequest.description().trim()
-                : (existingPost != null ? defaultIfBlank(existingPost.getDescription()) : "None");
+        String techStack = formatTechStack(stack);
 
+        return formatEmbeddingTemplate(title, techStack, description);
+    }
+
+
+
+    private String resolveVal(String updateVal, String existingVal) {
+        if (updateVal != null && !updateVal.isBlank()) {
+            return updateVal.trim();
+        }
+        if (existingVal != null && !existingVal.isBlank()) {
+            return existingVal.trim();
+        }
+        return "None";
+    }
+
+    private String formatTechStack(List<String> techStack) {
+        if (techStack == null || techStack.isEmpty()) {
+            return "None";
+        }
+        return String.join(", ", techStack);
+    }
+
+    private String formatEmbeddingTemplate(String title, String techStack, String description) {
         return """
-        Job Title: %s
-        Required Tech Stack: %s
-        Job Responsibilities and Description: %s
-        """.formatted(title, techStack, description).trim();
+    Job Title: %s
+    Required Tech Stack: %s
+    Job Responsibilities and Description: %s
+    """.formatted(title, techStack, description).trim();
     }
 
     private String defaultIfBlank(String value) {
