@@ -1,5 +1,6 @@
 package io.github.codewithwasif.techhire.service;
 
+import io.github.codewithwasif.techhire.ai.service.JobEmbeddingSvc;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.entity.JobApplyEntity;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;

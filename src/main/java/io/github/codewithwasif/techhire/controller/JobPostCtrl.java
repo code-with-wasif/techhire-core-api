@@ -1,6 +1,8 @@
 package io.github.codewithwasif.techhire.controller;
 
 
+import io.github.codewithwasif.techhire.ai.dto.EnhanceJobDescriptionRequest;
+import io.github.codewithwasif.techhire.ai.service.JobAiEnhancerSvc;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.service.JobPostSvc;
 import io.swagger.v3.oas.annotations.Operation;
@@ -8,8 +10,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 
 import java.util.List;
 
@@ -21,6 +25,7 @@ import java.util.List;
 public class JobPostCtrl {
 
     private final JobPostSvc jobPostSvc;
+    private final JobAiEnhancerSvc jobAiEnhancerSvc;
 
     @Operation(
             summary = "Create a new job post",
@@ -66,5 +71,11 @@ public class JobPostCtrl {
     public ResponseEntity<List<JobPostDto.ApplicantReviewResponse>> getApplicantsById(@PathVariable Long id){
         List<JobPostDto.ApplicantReviewResponse> responses = jobPostSvc.getApplicantsById(id);
        return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping(value = "enhance-description", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public ResponseEntity<Flux<String>> jobDescriptionEnhancer(@Valid @RequestBody EnhanceJobDescriptionRequest descriptionRequest){
+        Flux<String> stringFlux = jobAiEnhancerSvc.jobDescriptionEnhancer(descriptionRequest);
+        return ResponseEntity.ok(stringFlux);
     }
 }

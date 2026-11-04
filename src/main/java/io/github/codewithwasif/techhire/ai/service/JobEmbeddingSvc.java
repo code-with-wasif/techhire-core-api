@@ -1,8 +1,8 @@
-package io.github.codewithwasif.techhire.service;
+package io.github.codewithwasif.techhire.ai.service;
 
+import io.github.codewithwasif.techhire.ai.prompt.JobAiPromptBuilder;
 import io.github.codewithwasif.techhire.dto.JobPostDto;
 import io.github.codewithwasif.techhire.entity.JobPostEntity;
-import io.github.codewithwasif.techhire.mapper.JobPostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.stereotype.Component;
@@ -14,10 +14,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class JobEmbeddingSvc {
     private final EmbeddingModel embeddingModel;
-    private final JobPostMapper jobPostMapper;
+    private final JobAiPromptBuilder jobAiPromptBuilder;
+
 
     public float[] generateEmbedding(JobPostDto.CreateJobPostRequest request){
-        String embeddingText = jobPostMapper.buildJobEmbeddingText(request);
+        String embeddingText = jobAiPromptBuilder.buildJobEmbeddingText(request);
         return embeddingModel.embed(embeddingText);
     }
 
@@ -32,7 +33,7 @@ public class JobEmbeddingSvc {
         boolean hasTechStackUpdate = requestPost.techStack() != null && !requestPost.techStack().isEmpty();
 
         if (hasTitleUpdate || hasDescUpdate || hasTechStackUpdate) {
-            String embeddingText = jobPostMapper.buildJobEmbeddingText(existingPost, requestPost);
+            String embeddingText = jobAiPromptBuilder.buildJobEmbeddingText(existingPost, requestPost);
             return Optional.of(embeddingModel.embed(embeddingText));
         }
         return Optional.empty();
