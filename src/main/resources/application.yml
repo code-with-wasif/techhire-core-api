@@ -22,19 +22,24 @@ spring:
         hibernate:
           format_sql: true
 
+
   ai:
+
+    openai:
+      base-url: https://api.groq.com/openai
+      api-key: ${GROQ_API_KEY}
+      chat:
+        options:
+          model: openai/gpt-oss-120b
+          temperature: 0.3
+
     google:
       genai:
+        project-id: ${GEMINI_PROJECT_ID:tech-hire-project}
         api-key: ${GEMINI_API_KEY}
-        chat:
-          options:
-            model: ${GEMINI_CHAT_MODEL}
-
         embedding:
-          api-key: ${GEMINI_API_KEY}
           text:
-            options:
-              model: ${GEMINI_EMBEDDING_MODEL}
+            model: ${GEMINI_EMBEDDING_MODEL}
 
 
 
